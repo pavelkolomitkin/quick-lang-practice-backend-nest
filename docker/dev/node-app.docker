@@ -1,0 +1,8 @@
+FROM node:10.16.0-stretch-slim
+
+# TODO Perhaps we have to install tsc as well
+
+RUN npm install -g typescript \
+    && npm i -g @nestjs/cli
+
+CMD [ "node" ]

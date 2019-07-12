@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  node-app-service:
+    build:
+      context: .
+      dockerfile: node-app.docker
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    working_dir: /app
+    container_name: 'node-app-container-dev'
+    volumes:
+      - ../../:/app
+    links:
+      - mongodb-service
+    command: 'npm run start:debug'
+    hostname: 'node-app-service'
+    environment:
+      APP_ENV: 'dev'
+      APP_SECRET: 'change_it'
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '1234'
+      MONGO_INITDB_DATABASE: 'qlp_practice'
+      MONGO_DATABASE_PORT: '27017'
+      PORT: '3000'
+      NOREPLY_EMAIL: 'noreply@qlpractice.com'
+      EMAIL_LINK_HOST: 'localhost:4200'
+
+  mongodb-service:
+    image: mongo:4.0.10-xenial
+    container_name: 'mongo-db-container-dev'
+    ports:
+      - '27017:27017'
+    restart: always
+    volumes:
+      - quick_lang_practice_db_dev:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: '1234'
+      MONGO_INITDB_DATABASE: 'qlp_practice'
+    command: 'mongod --auth'
+
+  mongo-admin-service:
+    image: mongo-express
+    container_name: 'mongo-admin'
+    ports:
+      - '8081:8081'
+    links:
+      - mongodb-service
+    environment:
+      ME_CONFIG_MONGODB_SERVER: 'mongodb-service'
+      ME_CONFIG_BASICAUTH_USERNAME: 'root'
+      ME_CONFIG_BASICAUTH_PASSWORD: '1234'
+      ME_CONFIG_MONGODB_ADMINUSERNAME: 'root'
+      ME_CONFIG_MONGODB_ADMINPASSWORD: '1234'
+
+
+
+volumes:
+  quick_lang_practice_db_dev:
