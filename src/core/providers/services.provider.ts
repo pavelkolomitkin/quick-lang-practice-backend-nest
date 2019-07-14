@@ -11,7 +11,11 @@ export const services: Provider[] = [
         inject: [ConfigService],
         useFactory: async (configService: ConfigService): Promise<typeof mongoose> => {
             const dbConfig = configService.getMongoConfig();
-            return await mongoose.connect(dbConfig.uri, dbConfig.options);
+            await mongoose.connect(dbConfig.uri, dbConfig.options);
+            mongoose.set('toJSON', { virtuals: true });
+            mongoose.set('toObject', { virtuals: true });
+
+            return mongoose;
         },
     },
     {

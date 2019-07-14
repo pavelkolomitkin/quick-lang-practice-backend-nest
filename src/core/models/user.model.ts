@@ -1,14 +1,12 @@
 import { Document } from 'mongoose';
 
-import { Exclude, Expose, Transform } from 'class-transformer';
-import {EntityIdModel} from './entity-id.model';
+import {Exclude, Expose, Transform} from 'class-transformer';
+import {BaseEntityModel} from './base-entity.model';
 
-export class User extends EntityIdModel implements Document {
+@Exclude()
+export class User extends BaseEntityModel implements Document {
 
-    @Transform(value => value.toString())
-    _id: string;
-
-    @Exclude()
+    @Expose({ groups: ['mine', 'admin'] })
     email: string;
 
     @Exclude()
@@ -26,9 +24,6 @@ export class User extends EntityIdModel implements Document {
     @Exclude()
     updatedAt: string;
 
-    @Expose({ name: 'roles' })
-    getRoles(): string[]
-    {
-        return ['ROLE_USER'];
-    }
+    @Expose()
+    roles: string[];
 }

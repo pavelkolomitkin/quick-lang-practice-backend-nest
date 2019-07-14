@@ -13,10 +13,10 @@ export class LanguageController {
     @Get('list')
     async getLanguageList()
     {
-        const list = await this.model.find({}).lean()
+        const list = await this.model.find({})
             .map((result) => {
                 return result.map((item) => {
-                    return plainToClass(Language, item);
+                    return item.serialize();
                 });
             });
 

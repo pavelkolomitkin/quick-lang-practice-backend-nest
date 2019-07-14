@@ -26,4 +26,8 @@ UserSchema.methods.getRoles = () => {
     return ['ROLE_USER'];
 };
 
+UserSchema.virtual('roles').get(function(){
+    return this.getRoles();
+});
+
 export { UserSchema };

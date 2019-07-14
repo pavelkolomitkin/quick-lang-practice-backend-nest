@@ -18,6 +18,7 @@ import {AuthGuard} from '@nestjs/passport';
 import {UserCredentialsDto} from './dto/user-credentials.dto';
 import {plainToClass, Type} from 'class-transformer';
 import {User} from '../core/models/user.model';
+import { User as CurrentUser } from '../core/decorators/user.decorator';
 import {ClientUser} from '../core/models/client-user.model';
 
 @Controller('security')
@@ -69,15 +70,7 @@ export class SecurityController {
 
     @Get('profile')
     @UseGuards(AuthGuard())
-    async getProfile(@Req() { user }) {
-
-        user = user.toObject();
-
-        let userType = User;
-        if (user.__t === 'ClientUser')
-        {
-            userType = ClientUser;
-        }
-        return plainToClass(userType, user);
+    async getProfile(@CurrentUser() user) {
+        return user.serialize(['mine']);
     }
 }

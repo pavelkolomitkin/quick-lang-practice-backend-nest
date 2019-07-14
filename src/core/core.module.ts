@@ -6,6 +6,8 @@ import {APP_PIPE, APP_INTERCEPTOR, APP_FILTER} from '@nestjs/core';
 import {LanguageController} from './controllers/language.controller';
 import {LanguageLevelController} from './controllers/language-level.controller';
 import {BadRequestFilter} from './fiters/bad-request.filter';
+import {SecurityModule} from '../security/security.module';
+import {EntityExistsValidator} from './validators/entity-exists.validator';
 
 @Global()
 @Module({
@@ -24,15 +26,20 @@ import {BadRequestFilter} from './fiters/bad-request.filter';
             provide: APP_INTERCEPTOR,
             useClass: ClassSerializerInterceptor,
         },
+
+        EntityExistsValidator,
     ],
     imports: [
         ConfigModule,
+        SecurityModule
     ],
 
     exports: [
         ConfigModule,
         ...services,
         ...models,
+        SecurityModule,
+        EntityExistsValidator,
     ],
 
     controllers: [

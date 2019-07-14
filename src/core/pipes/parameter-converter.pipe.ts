@@ -4,15 +4,20 @@ import {ArgumentMetadata, Inject, Injectable, NotFoundException, PipeTransform} 
 @Injectable()
 export class ParameterConverterPipe implements PipeTransform
 {
-    constructor(private readonly modelName: string, private readonly fieldName: string) {}
+    constructor(private modelName: string, private fieldName: string) {}
 
     async transform(value: string, metadata: ArgumentMetadata): Promise<any> {
+
+        if (this.fieldName == 'id')
+        {
+            this.fieldName = '_id';
+        }
 
         const query = {};
         query[this.fieldName] = value;
 
         const result = await mongoose.model(this.modelName).findOne(query);
-        if (result) {
+        if (!result) {
             throw new NotFoundException(`'${this.modelName}' with ${this.fieldName} = ${value} was not found!`);
         }
 
