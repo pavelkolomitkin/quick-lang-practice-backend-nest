@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Inject, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Get, Inject, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe';
 import {User as CurrentUser} from '../../core/decorators/user.decorator';
@@ -6,9 +6,6 @@ import {ClientUser} from '../../core/models/client-user.model';
 import { Model } from 'mongoose';
 import {ProfileDto} from '../dto/profile.dto';
 import {LanguageSkill} from '../../core/models/language-skill.model';
-import {LanguageSkillDto} from '../dto/language-skill.dto';
-import {Language} from '../../core/models/language.model';
-import {LanguageLevel} from '../../core/models/language-level.model';
 
 // TODO find the way of arranging nested routes
 @Controller('client/profile')
@@ -49,5 +46,38 @@ export class ProfileController
 
         // @ts-ignore
         await profile.save();
+    }
+
+    @Put('practice-skill/off')
+    async readyToPracticeSkillOff(@CurrentUser() user: ClientUser)
+    {
+        user.readyToPracticeSkill = null;
+        // @ts-ignore
+        await user.save();
+
+        return { skill: null };
+    }
+
+    @Put('practice-skill/:id')
+    async readyToPracticeSkillOn(
+        @Param('id', new ParameterConverterPipe('LanguageSkill', 'id')) skill: LanguageSkill,
+        @CurrentUser() user: ClientUser
+        )
+    {
+        if (skill.user.toString() !== user.id.toString())
+        {
+            throw new BadRequestException('You can not use this skill!');
+        }
+
+        user.readyToPracticeSkill = skill;
+
+        // @ts-ignore
+        await user.save();
+
+        // @ts-ignore
+        return {
+            // @ts-ignore
+            skill: skill.serialize()
+        };
     }
 }

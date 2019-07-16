@@ -16,7 +16,14 @@ export class ParameterConverterPipe implements PipeTransform
         const query = {};
         query[this.fieldName] = value;
 
-        const result = await mongoose.model(this.modelName).findOne(query);
+        let result = null;
+        try {
+            result = await mongoose.model(this.modelName).findOne(query);
+        }
+        catch (e) {
+
+        }
+
         if (!result) {
             throw new NotFoundException(`'${this.modelName}' with ${this.fieldName} = ${value} was not found!`);
         }
