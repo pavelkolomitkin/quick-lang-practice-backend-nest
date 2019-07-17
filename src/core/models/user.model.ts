@@ -18,6 +18,9 @@ export class User extends BaseEntityModel implements Document {
     @Exclude()
     isActive: boolean;
 
+    @Expose()
+    avatar: any;
+
     @Exclude()
     createdAt: string;
 

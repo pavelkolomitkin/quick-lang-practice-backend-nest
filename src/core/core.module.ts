@@ -8,6 +8,10 @@ import {LanguageLevelController} from './controllers/language-level.controller';
 import {BadRequestFilter} from './fiters/bad-request.filter';
 import {SecurityModule} from '../security/security.module';
 import {EntityExistsValidator} from './validators/entity-exists.validator';
+import {MulterModule} from '@nestjs/platform-express';
+import {AvatarController} from './controllers/avatar.controller';
+import {ImageThumbService} from './services/image-thumb.service';
+import {UploadManagerService} from './services/upload-manager.service';
 
 @Global()
 @Module({
@@ -28,10 +32,15 @@ import {EntityExistsValidator} from './validators/entity-exists.validator';
         },
 
         EntityExistsValidator,
+        ImageThumbService,
+        UploadManagerService,
     ],
     imports: [
         ConfigModule,
-        SecurityModule
+        SecurityModule,
+        MulterModule.register({
+            dest: process.env.UPLOAD_DIRECTORY
+        })
     ],
 
     exports: [
@@ -39,12 +48,15 @@ import {EntityExistsValidator} from './validators/entity-exists.validator';
         ...services,
         ...models,
         SecurityModule,
+        MulterModule,
         EntityExistsValidator,
+        ImageThumbService,
+        UploadManagerService,
     ],
-
     controllers: [
         LanguageController,
         LanguageLevelController,
+        AvatarController,
     ],
 
 })

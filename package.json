@@ -31,6 +31,7 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
     "crypto-js": "^3.1.9-1",
+    "fs-extra": "^8.1.0",
     "migrate-mongo": "^6.0.0",
     "mongoose": "^5.6.4",
     "mongoose-autopopulate": "^0.9.1",
@@ -39,7 +40,8 @@
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "sharp": "^0.22.1"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
