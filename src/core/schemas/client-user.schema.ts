@@ -13,7 +13,6 @@ const ClientUserSchema = new Schema({
     readyToPracticeSkill: {
         type: Schema.Types.ObjectId,
         ref: 'LanguageSkill',
-        required: false,
     },
 },
 {
@@ -21,9 +20,13 @@ const ClientUserSchema = new Schema({
 },
 );
 
-ClientUserSchema.virtual('roles').get(() => {
-
+ClientUserSchema.methods.getRoles = () => {
     return ['ROLE_CLIENT_USER'];
+};
+
+ClientUserSchema.virtual('roles').get(function() {
+
+    return this.getRoles();
 
 });
 

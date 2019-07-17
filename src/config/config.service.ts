@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as mongoConfig from './mongo-config.js';
+import { config as thumb } from './thumb';
+
 
 @Injectable()
 export class ConfigService {
@@ -14,4 +16,8 @@ export class ConfigService {
         return mongoConfig;
     }
 
+    public getThumbConfig()
+    {
+        return thumb;
+    }
 }
