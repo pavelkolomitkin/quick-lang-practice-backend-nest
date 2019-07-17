@@ -39,10 +39,12 @@ import {UploadManagerService} from './services/upload-manager.service';
         ConfigModule,
         SecurityModule,
         MulterModule.register({
-            dest: process.env.UPLOAD_DIRECTORY
+            dest: process.env.UPLOAD_DIRECTORY,
+            limits: {
+                fileSize: parseInt(process.env.MAX_UPLOAD_FILE_SIZE),
+            }
         })
     ],
-
     exports: [
         ConfigModule,
         ...services,

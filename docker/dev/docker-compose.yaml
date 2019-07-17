@@ -30,6 +30,7 @@ services:
       EMAIL_LINK_HOST: 'localhost:4200'
       UPLOAD_DIRECTORY: '/app/upload'
       IMAGE_THUMB_DIRECTORY: '/app/thumbs'
+      MAX_UPLOAD_FILE_SIZE: '7340032' # 7M
 
   mongodb-service:
     image: mongo:4.0.10-xenial
