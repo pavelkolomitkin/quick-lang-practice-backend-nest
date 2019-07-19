@@ -24,6 +24,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: 'root'
       MONGO_INITDB_ROOT_PASSWORD: '1234'
       MONGO_INITDB_DATABASE: 'qlp_practice'
+      MONGO_REPLICASET: 'rs_qlp'
       MONGO_DATABASE_PORT: '27017'
       PORT: '3000'
       NOREPLY_EMAIL: 'noreply@qlpractice.com'
@@ -36,31 +37,30 @@ services:
     image: mongo:4.0.10-xenial
     container_name: 'mongo-db-container-dev'
     ports:
-      - '27017:27017'
+      - '30001:27017'
     restart: always
     volumes:
       - quick_lang_practice_db_dev:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: 'root'
-      MONGO_INITDB_ROOT_PASSWORD: '1234'
+#      MONGO_INITDB_ROOT_USERNAME: 'root'
+#      MONGO_INITDB_ROOT_PASSWORD: '1234'
       MONGO_INITDB_DATABASE: 'qlp_practice'
-    command: 'mongod --auth'
+    command: mongod --replSet rs_qlp
 
-  mongo-admin-service:
-    image: mongo-express
-    container_name: 'mongo-admin'
-    ports:
-      - '8081:8081'
-    links:
-      - mongodb-service
-    environment:
-      ME_CONFIG_MONGODB_SERVER: 'mongodb-service'
-      ME_CONFIG_BASICAUTH_USERNAME: 'root'
-      ME_CONFIG_BASICAUTH_PASSWORD: '1234'
-      ME_CONFIG_MONGODB_ADMINUSERNAME: 'root'
-      ME_CONFIG_MONGODB_ADMINPASSWORD: '1234'
-
-
+#  mongo-admin-service:
+#    image: mongo-express
+#    container_name: 'mongo-admin'
+#    ports:
+#      - '8081:8081'
+#    links:
+#      - mongodb-service
+#    environment:
+#      ME_CONFIG_MONGODB_SERVER: 'mongodb-service/rs0'
+#      ME_CONFIG_MONGODB_PORT: 30001
+#      ME_CONFIG_BASICAUTH_USERNAME: 'root'
+#      ME_CONFIG_BASICAUTH_PASSWORD: '1234'
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: 'root'
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: '1234'
 
 volumes:
   quick_lang_practice_db_dev:

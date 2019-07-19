@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import {UserRegisterDto} from './dto/user-register.dto';
-import {SecurityService} from './security.service';
+import {SecurityService} from './services/security.service';
 import {UserConfirmRegisterDto} from './dto/user-confirm-register.dto';
 import {UserRestorePasswordRequestDto} from './dto/user-restore-password-request.dto';
 import {UserRestorePasswordDto} from './dto/user-restore-password.dto';

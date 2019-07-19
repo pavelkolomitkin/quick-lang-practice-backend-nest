@@ -1,7 +1,6 @@
 import {ArgumentsHost, BadRequestException, Catch, ExceptionFilter} from '@nestjs/common';
 import { Request, Response } from 'express';
 
-// TODO apply it as a provider
 @Catch(BadRequestException)
 export class BadRequestFilter implements ExceptionFilter
 {

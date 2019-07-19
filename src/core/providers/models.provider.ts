@@ -124,4 +124,14 @@ export const models: Provider[] = [
         inject: ['DATABASE_CONNECTION'],
         useFactory: (connection: Connection) => connection.model('RegisterKey', RegisterKeySchema),
     },
+    {
+        provide: 'UserContact',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => connection.model('UserContact', RegisterKeySchema),
+    },
+    {
+        provide: 'ContactMessage',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => connection.model('ContactMessage', RegisterKeySchema),
+    }
 ];
