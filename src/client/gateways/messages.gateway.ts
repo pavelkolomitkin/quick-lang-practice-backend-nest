@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
@@ -9,10 +9,12 @@ import {
 } from '@nestjs/websockets';
 import { Client, Server } from 'socket.io';
 import {Inject, Injectable} from '@nestjs/common';
+import {WsJwtGuard} from '../../security/guards/ws-jwt.guard';
+import {User} from '../../core/models/user.model';
+import {ContactMessageLog} from '../../core/models/contact-message-log.model';
 import {ContactMessage} from '../../core/models/contact-message.model';
-import {WsAuthService} from '../../security/services/ws-auth.service';
-import {JwtService} from '@nestjs/jwt';
-import {JwtAuthService} from '../../security/services/jwt-auth.service';
+import {ContactMessageLogActions} from '../../core/schemas/contact-message-log.schema';
+import {serialize} from 'class-transformer';
 
 
 @Injectable()
@@ -21,99 +23,101 @@ import {JwtAuthService} from '../../security/services/jwt-auth.service';
 })
 export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+    users: User[] = [];
+
     @WebSocketServer()
     server: Server;
 
     constructor(
+        @Inject('ContactMessageLog') private readonly messageLogModel: Model<ContactMessageLog>,
         @Inject('ContactMessage') private readonly messageModel: Model<ContactMessage>,
-        private authService: JwtAuthService
+        private guard: WsJwtGuard,
     ) {}
 
     afterInit(server: Server): any
     {
-        console.log('AFTER INIT SERVER');
+        //console.log('AFTER INIT SERVER');
 
-        server.use(async (socket, next) => {
-
-            console.log('THIS IS A WS MIDDLEWARE');
-            //socket.request._query['token'];
-            const token = socket.request._query['token'];
-            if (!token)
-            {
-                next(new Error('Authorization Error'));
-                return;
-            }
-
-            const user = await this.authService.getUser(token);
-            if (!user)
-            {
-                next(new Error('Authorization Error'));
-                return;
-            }
-
-            // @ts-ignore
-            socket.user = user;
-            next();
-
-        });
+        this.guard.authorize(server);
     }
 
     handleConnection(client: Client, ...args: any[]): any
     {
-        console.log('Client is connected!');
-        //debugger
+        //console.log('Client is connected!');
         // @ts-ignore
         const { user } = client;
-        if (user)
-        {
-            const messageStream = this.messageModel.watch();
+        // @ts-ignore
+        client.messageStream = this
+            .messageLogModel
+            .watch([
+                { $match: {
+                    'operationType': 'insert',
+                    'fullDocument.addressee': new Types.ObjectId(user.id)
+                } },
+            ]);
 
-            messageStream.on('change', (message) => {
-                console.log('NEW MESSAGE');
-                console.log(message);
 
-                // @ts-ignore
-                client.emit('new_message', message);
-            });
+        // @ts-ignore
+        client.messageStream.on('change', async (message) => {
 
-        }
-        else
-        {
-            // @ts-ignore
-            client.disconnect();
-        }
-        // TODO get current user
+            const { fullDocument } = message;
 
-        // watch new message number
+            //const messageEntity = await this.messageModel.populate(fullDocument, { path: 'message' });
+            let messageEntity = await this.messageModel.findById(fullDocument.message)
+                .populate('author');
 
-        // watch new messages
-        // const newMessageStream = this.messageModel.watch();
-        // newMessageStream.on('change', (next) => {
-        //
-        //     console.log(next);
-        //     client.conn.emit('newMessage', next);
-        // });
+            const author = messageEntity.author.serialize();
+            messageEntity = {
+                ...messageEntity.serialize(),
+                author
+            };
 
+            // console.log('NEW MESSAGE');
+            // console.log(messageEntity);
+
+            switch (fullDocument.action) {
+
+                case ContactMessageLogActions.ADD:
+
+                    // @ts-ignore
+                    client.emit('message_new', messageEntity);
+                    break;
+
+                case ContactMessageLogActions.EDIT:
+
+                    // @ts-ignore
+                    client.emit('message_edited', messageEntity);
+                    break;
+
+                case ContactMessageLogActions.REMOVE:
+
+                    // @ts-ignore
+                    client.emit('message_remove', messageEntity);
+                    break;
+            }
+
+        });
     }
 
     handleDisconnect(client: Client): any
     {
-        console.log('Client is disconnected!');
+        //console.log('Client is disconnected!');
+
+        // @ts-ignore
+        client.messageStream.close();
+
+        // @ts-ignore
+        client.messageStream = null;
+
+        // @ts-ignore
+        client.conn.close();
+        // @ts-ignore
+        client.removeAllListeners();
+        // @ts-ignore
+        client.disconnect(true);
     }
 
     //==================== SUBSCRIBERS ========================
-
-    @SubscribeMessage('test')
-    handleTestMessage(client: Client, data: any)
-    {
-        console.log('Message "Test" is here!');
-
-        // @ts-ignore
-        client.emit('test_receive', {
-            message: 'Hello from server!',
-            data: data
-        });
-    }
 
 
     //==================== Working with the contact list ======

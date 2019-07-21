@@ -11,15 +11,15 @@ const UserContactSchema = new Schema({
         ref: 'User'
     },
 
-    messages: [{
+    newMessages: [{
         type: Schema.Types.ObjectId,
         ref: 'ContactMessage'
     }],
 
-    newMessages: [{
+    lastMessage: {
         type: Schema.Types.ObjectId,
         ref: 'ContactMessage'
-    }]
+    }
 },
     {
         timestamps: true,

@@ -15,6 +15,12 @@ import {LanguageLevel} from '../models/language-level.model';
 import {LanguageSkill} from '../models/language-skill.model';
 import {BaseEntityModel} from '../models/base-entity.model';
 import {ConfigService} from '../../config/config.service';
+import {UserContactSchema} from '../schemas/user-contact.schema';
+import {ContactMessageSchema} from '../schemas/contact-message.schema';
+import {UserContact} from '../models/user-contact.model';
+import {ContactMessage} from '../models/contact-message.model';
+import {ContactMessageLogSchema} from '../schemas/contact-message-log.schema';
+import {ContactMessageLog} from '../models/contact-message-log.model';
 
 const serialize = function(modelClass, groups: string[] = []) {
 
@@ -127,11 +133,28 @@ export const models: Provider[] = [
     {
         provide: 'UserContact',
         inject: ['DATABASE_CONNECTION'],
-        useFactory: (connection: Connection) => connection.model('UserContact', RegisterKeySchema),
+        useFactory: (connection: Connection) => {
+
+            UserContactSchema.methods.serialize = createSerializer([UserContact]);
+            return connection.model('UserContact', UserContactSchema);
+        },
     },
     {
         provide: 'ContactMessage',
         inject: ['DATABASE_CONNECTION'],
-        useFactory: (connection: Connection) => connection.model('ContactMessage', RegisterKeySchema),
+        useFactory: (connection: Connection) => {
+
+            ContactMessageSchema.methods.serialize = createSerializer([ContactMessage]);
+            return connection.model('ContactMessage', ContactMessageSchema);
+        },
+    },
+    {
+        provide: 'ContactMessageLog',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => {
+
+            ContactMessageLogSchema.methods.serialize = createSerializer([ContactMessageLog]);
+            return connection.model('ContactMessageLog', ContactMessageLogSchema);
+        }
     }
 ];

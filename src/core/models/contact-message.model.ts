@@ -15,4 +15,10 @@ export class ContactMessage extends BaseEntityModel implements Document
 
     @Exclude()
     contacts: UserContact[];
+
+    @Expose()
+    createdAt: string;
+
+    @Expose()
+    updatedAt: string;
 }

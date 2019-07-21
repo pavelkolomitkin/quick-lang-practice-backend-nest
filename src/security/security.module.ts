@@ -9,8 +9,8 @@ import {JwtStrategy} from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import {UserPasswordsEqualValidator} from './validators/user-passwords-equal.validator';
-import {WsJwtGuard} from './guards/ws-jwt.guard';
 import {JwtAuthService} from './services/jwt-auth.service';
+import {WsJwtGuard} from './guards/ws-jwt.guard';
 
 @Module({
   imports: [
@@ -30,15 +30,12 @@ import {JwtAuthService} from './services/jwt-auth.service';
       JwtStrategy,
       SecurityService,
       JwtAuthService,
-      //WsJwtGuard
+      WsJwtGuard
   ],
     exports: [
         PassportModule,
         JwtModule,
-        SecurityService,
-        JwtAuthService,
-        //WsJwtGuard
-
+        WsJwtGuard,
     ],
 })
 export class SecurityModule {}

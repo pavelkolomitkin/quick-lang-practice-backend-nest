@@ -1,29 +1,39 @@
-import {CanActivate, ExecutionContext, Inject, Injectable} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import {SecurityService} from '../services/security.service';
-import {WsAuthService} from '../services/ws-auth.service';
+import {Injectable} from '@nestjs/common';
+import { Client, Server } from 'socket.io';
+import {JwtAuthService} from '../services/jwt-auth.service';
 
 @Injectable()
-export class WsJwtGuard implements CanActivate
+export class WsJwtGuard
 {
     constructor(
-        private authService: WsAuthService
+        private authService: JwtAuthService
         ) {
     }
 
-    async canActivate(context: ExecutionContext): Promise<boolean>
+    authorize(server: Server)
     {
-        const client = context.switchToWs().getClient();
+        server.use(async (socket, next) => {
 
-        const user = await this.authService.getClientUser(client);
-        if (!user)
-        {
-            return false;
-        }
+            console.log('THIS IS A WS MIDDLEWARE');
+            //socket.request._query['token'];
+            const token = socket.request._query['token'];
+            if (!token)
+            {
+                next(new Error('Authorization Error'));
+                return;
+            }
 
-        context.switchToWs().getData().user = user;
+            const user = await this.authService.getUser(token);
+            if (!user)
+            {
+                next(new Error('Authorization Error'));
+                return;
+            }
 
-        return true;
+            // @ts-ignore
+            socket.user = user;
+            next();
+
+        })
     }
-
 }

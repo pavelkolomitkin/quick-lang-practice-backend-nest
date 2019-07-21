@@ -21,7 +21,7 @@ export class ParameterConverterPipe implements PipeTransform
             result = await mongoose.model(this.modelName).findOne(query);
         }
         catch (e) {
-
+            debugger
         }
 
         if (!result) {
