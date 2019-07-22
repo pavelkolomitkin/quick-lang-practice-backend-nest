@@ -21,6 +21,8 @@ import {UserContact} from '../models/user-contact.model';
 import {ContactMessage} from '../models/contact-message.model';
 import {ContactMessageLogSchema} from '../schemas/contact-message-log.schema';
 import {ContactMessageLog} from '../models/contact-message-log.model';
+import {UserActivitySchema} from '../schemas/user-activity.schema';
+import {UserActivity} from '../models/user-activity.model';
 
 const serialize = function(modelClass, groups: string[] = []) {
 
@@ -155,6 +157,15 @@ export const models: Provider[] = [
 
             ContactMessageLogSchema.methods.serialize = createSerializer([ContactMessageLog]);
             return connection.model('ContactMessageLog', ContactMessageLogSchema);
+        }
+    },
+    {
+        provide: 'UserActivity',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => {
+
+            UserActivitySchema.methods.serialize = createSerializer([UserActivity]);
+            return connection.model('UserActivity', UserActivitySchema);
         }
     }
 ];

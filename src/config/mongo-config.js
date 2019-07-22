@@ -5,7 +5,8 @@ module.exports = {
         useNewUrlParser: true,
         replicaSet: process.env.MONGO_REPLICASET,
         autoIndex: false,
-        poolSize: 200
+        poolSize: 200,
+        useFindAndModify: false
     },
 
     databaseName: process.env.MONGO_INITDB_DATABASE

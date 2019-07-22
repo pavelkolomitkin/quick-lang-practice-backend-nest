@@ -14,7 +14,6 @@ export class WsJwtGuard
     {
         server.use(async (socket, next) => {
 
-            console.log('THIS IS A WS MIDDLEWARE');
             //socket.request._query['token'];
             const token = socket.request._query['token'];
             if (!token)

@@ -14,7 +14,8 @@ import {User} from '../../core/models/user.model';
 import {ContactMessageLog} from '../../core/models/contact-message-log.model';
 import {ContactMessage} from '../../core/models/contact-message.model';
 import {ContactMessageLogActions} from '../../core/schemas/contact-message-log.schema';
-import {serialize} from 'class-transformer';
+import {UserActivity} from '../../core/models/user-activity.model';
+import {ActivityTypes} from '../../core/schemas/user-activity.schema';
 
 
 @Injectable()
@@ -31,6 +32,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     constructor(
         @Inject('ContactMessageLog') private readonly messageLogModel: Model<ContactMessageLog>,
         @Inject('ContactMessage') private readonly messageModel: Model<ContactMessage>,
+        @Inject('UserActivity') private readonly userActivityModel: Model<UserActivity>,
         private guard: WsJwtGuard,
     ) {}
 
@@ -62,8 +64,9 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
             const { fullDocument } = message;
 
-            //const messageEntity = await this.messageModel.populate(fullDocument, { path: 'message' });
-            let messageEntity = await this.messageModel.findById(fullDocument.message)
+            let messageEntity = await this
+                .messageModel
+                .findById(fullDocument.message)
                 .populate('author');
 
             const author = messageEntity.author.serialize();
@@ -95,6 +98,41 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                     client.emit('message_remove', messageEntity);
                     break;
             }
+        });
+
+        // @ts-ignore
+        client.userActivityStream = this
+            .userActivityModel
+            .watch([
+                { $match: {
+                        'operationType': 'update',
+                        'fullDocument.addressee': new Types.ObjectId(user.id)
+                    }
+                }
+            ],
+                { fullDocument: 'updateLookup' });
+
+        // @ts-ignore
+        client.userActivityStream.on('change', async (activity) => {
+
+            const { fullDocument } = activity;
+            await this.userActivityModel.populate(fullDocument, { path: 'user' });
+
+            switch (fullDocument.type) {
+
+                case ActivityTypes.TYPING:
+
+                    if (fullDocument.payload)
+                    {
+
+                    }
+
+                    // @ts-ignore
+                    client.emit('activity_typing', fullDocument.user.serialize());
+
+                    break;
+
+            }
 
         });
     }
@@ -105,9 +143,13 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
         // @ts-ignore
         client.messageStream.close();
-
         // @ts-ignore
         client.messageStream = null;
+
+        // @ts-ignore
+        client.userActivityStream.close();
+        // @ts-ignore
+        client.userActivityStream = null;
 
         // @ts-ignore
         client.conn.close();
@@ -122,8 +164,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     //==================== Working with the contact list ======
 
-    // Remove a contact
-
     //==================// Working with the contact list ======
 
 
@@ -133,6 +173,30 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     // A user is typing
 
+    @SubscribeMessage('typing')
+    async handleUserTyping(client: Client, data: { addresseeId: string })
+    {
+        console.log('USER IS TYPING...');
+
+        await this.userActivityModel.updateOne(
+            {
+                addressee: new Types.ObjectId(data.addresseeId),
+                // @ts-ignore
+                user: new Types.ObjectId(client.user.id)
+            },
+            {
+                addressee: new Types.ObjectId(data.addresseeId),
+                // @ts-ignore
+                user: new Types.ObjectId(client.user.id),
+                type: ActivityTypes.TYPING,
+                payload: true
+            },
+            {
+                upsert: true,
+                'new': false
+            }
+        );
+    }
     // A user sends a message
 
     // Remove a message
