@@ -18,18 +18,31 @@ export class ContactMessageService
         private contactService: UserContactService
     ) {}
 
-    getListQuery(contact: UserContact, owner: User)
+    getListQuery(contact: UserContact, owner: User, criteria: any)
     {
         if (contact.user.toString() !== owner.id)
         {
             throw new CoreException();
         }
 
-
-        return this.model.find({
+        const filter = {
             contacts: contact.id
-        })
-            .sort({'createdAt': 0});
+        };
+
+        this.handleDateFilter(filter, criteria);
+
+        return this.model.find(filter)
+            .sort({'createdAt': -1});
+    }
+
+    private handleDateFilter(filter: any, criteria: any)
+    {
+        if (criteria.lastDate)
+        {
+            filter.createdAt = {
+                $lt: criteria.lastDate
+            };
+        }
     }
 
     async create(data: ContactMessageDto, addressee: User, user: User)

@@ -8,6 +8,7 @@ import {ContactMessage} from '../../core/models/contact-message.model';
 import {User} from '../../core/models/user.model';
 import {ContactMessageDto} from '../dto/contact-message.dto';
 import {ContactMessageService} from '../services/contact-message.service';
+import {DateTimePipe} from '../../core/pipes/date-time.pipe';
 
 @Controller('client/message')
 @UseGuards(AuthGuard())
@@ -21,16 +22,23 @@ export class ContactMessageController
     async getContactMessages(
         @Param('id', new ParameterConverterPipe('UserContact', 'id')) contact: UserContact,
         @CurrentUser() user,
+        @Query('lastDate', DateTimePipe) lastDate: Date,
         @Query('page', PageParamPipe) page: number = 1
     )
     {
+        console.log('Last date is :');
+        console.log(lastDate);
         try {
             const messages = await this
                 .service
-                .getListQuery(contact, user)
-                .populate('author');
+                .getListQuery(contact, user, {
+                    lastDate
+                })
+                .populate('author')
+                .limit(20);
                 // .skip((page - 1) * 10)
                 // .limit(10);
+
             return {
                 messages: messages.map((message) => {
 
