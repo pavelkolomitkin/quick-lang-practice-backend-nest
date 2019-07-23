@@ -78,7 +78,7 @@ export class ContactMessageController
             await this.service.update(data, message, user);
             return {
                 // @ts-ignore
-                message: message.serialize()
+                message: { ...message.serialize(), author: user.serialize() }
             };
         }
         catch (error) {

@@ -85,12 +85,13 @@ export class ContactMessageService
 
     async update(data: ContactMessageDto, message: ContactMessage, owner: User)
     {
-        if (message.author !== owner.id)
+        if (message.author.toString() !== owner.id)
         {
             throw new CoreException();
         }
 
         message.text = data.text;
+
 
         // @ts-ignore
         await message.save();
