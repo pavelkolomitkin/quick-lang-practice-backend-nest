@@ -13,6 +13,11 @@ const ContactMessageLogSchema = new Schema({
         ref: 'ContactMessage'
     },
 
+    actor: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+
     addressee: {
         type: Schema.Types.ObjectId,
         ref: 'User'
@@ -27,7 +32,8 @@ const ContactMessageLogSchema = new Schema({
         capped: {
             size: 1048576, // 1M
             max: 1000
-        }
+        },
+        timestamps: true,
     });
 
 export { ContactMessageLogSchema, ContactMessageLogActions };

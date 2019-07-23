@@ -37,6 +37,7 @@
     "migrate-mongo": "^6.0.0",
     "mongoose": "^5.6.4",
     "mongoose-autopopulate": "^0.9.1",
+    "mongoose-delete": "^0.5.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",

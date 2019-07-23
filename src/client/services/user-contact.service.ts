@@ -4,6 +4,7 @@ import {UserContact} from '../../core/models/user-contact.model';
 import {User} from '../../core/models/user.model';
 import {CoreException} from '../../core/exceptions/core.exception';
 import {ContactMessage} from '../../core/models/contact-message.model';
+import {async} from 'rxjs/internal/scheduler/async';
 
 @Injectable()
 export class UserContactService
@@ -147,5 +148,12 @@ export class UserContactService
 
         // @ts-ignore
         await contact.save();
+    }
+
+    async getMessageContacts(message: ContactMessage)
+    {
+        const populated: ContactMessage = await this.model.populate(message, { path: 'contacts' });
+
+        return populated.contacts;
     }
 }

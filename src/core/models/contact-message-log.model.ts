@@ -11,6 +11,9 @@ export class ContactMessageLog extends BaseEntityModel implements Document
     message: ContactMessage;
 
     @Expose()
+    actor: User;
+
+    @Expose()
     addressee: User;
 
     @Expose()

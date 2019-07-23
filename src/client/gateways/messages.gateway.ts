@@ -64,10 +64,21 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
             const { fullDocument } = message;
 
-            let messageEntity = await this
-                .messageModel
-                .findById(fullDocument.message)
-                .populate('author');
+            let messageEntity = null;
+            if (fullDocument.action === ContactMessageLogActions.REMOVE)
+            {
+                messageEntity = await this
+                    .messageModel
+                    .findOneDeleted({ _id: fullDocument.message})
+                    .populate('author');
+            }
+            else
+            {
+                messageEntity = await this
+                    .messageModel
+                    .findById(fullDocument.message)
+                    .populate('author');
+            }
 
             const author = messageEntity.author.serialize();
             messageEntity = {
@@ -75,8 +86,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                 author
             };
 
-            // console.log('NEW MESSAGE');
-            // console.log(messageEntity);
+            //console.log(message);
 
             switch (fullDocument.action) {
 
@@ -94,6 +104,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
                 case ContactMessageLogActions.REMOVE:
 
+                    //console.log('MESSAGE HAS BEEN REMOVED!');
                     // @ts-ignore
                     client.emit('message_remove', messageEntity);
                     break;
@@ -124,11 +135,9 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
                     if (fullDocument.payload)
                     {
-
+                        // @ts-ignore
+                        client.emit('activity_typing', fullDocument.user.serialize());
                     }
-
-                    // @ts-ignore
-                    client.emit('activity_typing', fullDocument.user.serialize());
 
                     break;
 
@@ -176,8 +185,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @SubscribeMessage('typing')
     async handleUserTyping(client: Client, data: { addresseeId: string })
     {
-        console.log('USER IS TYPING...');
-
         await this.userActivityModel.updateOne(
             {
                 addressee: new Types.ObjectId(data.addresseeId),

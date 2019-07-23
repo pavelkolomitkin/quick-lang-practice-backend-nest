@@ -73,6 +73,7 @@ export class ContactMessageService
 
         const log = new this.logModel({
             message: result,
+            actor: user,
             addressee: addressee,
             action: ContactMessageLogActions.ADD
         });
@@ -94,21 +95,56 @@ export class ContactMessageService
         // @ts-ignore
         await message.save();
 
+        const contacts: UserContact[] = await this.contactService.getMessageContacts(message);
+
+        for (const contact of contacts)
+        {
+            if (contact.user !== owner.id)
+            {
+                const log = new this.logModel({
+                    message: message,
+                    actor: owner,
+                    addressee: contact.user,
+                    action: ContactMessageLogActions.EDIT
+                });
+
+                await log.save();
+            }
+        }
+
+
         return message;
     }
 
     async remove(message: ContactMessage, owner: User)
     {
-        if (message.author !== owner.id)
+        if (message.author.toString() !== owner.id)
         {
             throw new CoreException();
         }
+
+        const contacts: UserContact[] = await this.contactService.getMessageContacts(message);
 
         await this.contactService.removeNewMessageFromContacts(message);
         await this.contactService.removeLastMessageFromContacts(message);
 
         // @ts-ignore
-        await message.remove();
+        await message.delete();
+
+        for (const contact of contacts)
+        {
+            if (contact.user !== owner.id)
+            {
+                const log = new this.logModel({
+                    message: message,
+                    addressee: contact.user,
+                    action: ContactMessageLogActions.REMOVE
+                });
+
+                await log.save();
+            }
+
+        }
     }
 
     async read()
