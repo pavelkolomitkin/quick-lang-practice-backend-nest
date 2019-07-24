@@ -123,6 +123,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         // @ts-ignore
         client.userActivityStream.on('change', async (activity) => {
 
+            console.log('USER IS TYPING...');
             const { fullDocument } = activity;
             await this.userActivityModel.populate(fullDocument, { path: 'user' });
 
@@ -182,6 +183,9 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @SubscribeMessage('typing')
     async handleUserTyping(client: Client, data: { addresseeId: string })
     {
+        console.log('USER POST TYPING...');
+        console.log('addressee: ' + data.addresseeId);
+
         await this.userActivityModel.updateOne(
             {
                 addressee: new Types.ObjectId(data.addresseeId),
@@ -197,10 +201,11 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             },
             {
                 upsert: true,
-                'new': false
+                // 'new': false
             }
         );
     }
+
     // A user sends a message
 
     // Remove a message

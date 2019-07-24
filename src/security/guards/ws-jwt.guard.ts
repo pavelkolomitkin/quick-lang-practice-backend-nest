@@ -36,7 +36,6 @@ export class WsJwtGuard
                 next(new Error('Authorization Error'));
                 return;
             }
-
             // @ts-ignore
             socket.user = user;
             next();
