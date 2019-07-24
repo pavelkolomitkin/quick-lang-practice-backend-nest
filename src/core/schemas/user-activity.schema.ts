@@ -27,10 +27,6 @@ const UserActivitySchema = new Schema(
         }
     },
     {
-        capped: {
-            size: 1048576, // 1M
-            max: 1000
-        },
         timestamps: true,
     });
 

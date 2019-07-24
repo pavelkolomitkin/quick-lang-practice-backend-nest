@@ -185,6 +185,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     {
         console.log('USER POST TYPING...');
         console.log('addressee: ' + data.addresseeId);
+        // @ts-ignore
+        console.log('user: ' + client.user.id);
 
         await this.userActivityModel.updateOne(
             {
@@ -201,7 +203,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             },
             {
                 upsert: true,
-                // 'new': false
+                'new': true
             }
         );
     }
