@@ -22,7 +22,15 @@ export class WsJwtGuard
                 return;
             }
 
-            const user = await this.authService.getUser(token);
+            let user = null;
+
+            try {
+                user = await this.authService.getUser(token);
+            }
+            catch (error) {
+
+            }
+
             if (!user)
             {
                 next(new Error('Authorization Error'));
