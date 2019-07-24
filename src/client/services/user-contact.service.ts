@@ -35,7 +35,7 @@ export class UserContactService
 
     async remove(contact: UserContact, owner: User)
     {
-        if (contact.user !== owner.id)
+        if (contact.user.toString() !== owner.id)
         {
             throw new CoreException();
         }
@@ -96,11 +96,10 @@ export class UserContactService
 
     async read(contact: UserContact, owner: User)
     {
-        if (contact.user !== owner.id)
+        if (contact.user.toString() !== owner.id)
         {
             throw new CoreException();
         }
-
         contact.newMessages = [];
 
         // @ts-ignore
