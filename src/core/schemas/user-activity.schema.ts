@@ -1,7 +1,9 @@
 import { Schema } from 'mongoose';
 
 const ActivityTypes = {
-    TYPING: 'typing'
+    TYPING: 'typing',
+    BLOCK_USER: 'block_user',
+    UNBLOCK_USER: 'unblock_user'
 };
 
 const UserActivitySchema = new Schema(

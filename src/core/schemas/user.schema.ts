@@ -22,7 +22,8 @@ const UserSchema = new Schema(
         },
         blackList: [{
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            select: false
         }]
     },
     {

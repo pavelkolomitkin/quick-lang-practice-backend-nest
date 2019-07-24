@@ -10,7 +10,6 @@ import {
 import { Client, Server } from 'socket.io';
 import {Inject, Injectable} from '@nestjs/common';
 import {WsJwtGuard} from '../../security/guards/ws-jwt.guard';
-import {User} from '../../core/models/user.model';
 import {ContactMessageLog} from '../../core/models/contact-message-log.model';
 import {ContactMessage} from '../../core/models/contact-message.model';
 import {ContactMessageLogActions} from '../../core/schemas/contact-message-log.schema';
@@ -24,8 +23,6 @@ import {ActivityTypes} from '../../core/schemas/user-activity.schema';
 })
 export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-    users: User[] = [];
-
     @WebSocketServer()
     server: Server;
 
@@ -116,7 +113,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             .userActivityModel
             .watch([
                 { $match: {
-                        'operationType': 'update',
+                        // 'operationType': 'update',
                         'fullDocument.addressee': new Types.ObjectId(user.id)
                     }
                 }

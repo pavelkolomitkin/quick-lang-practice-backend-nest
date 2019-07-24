@@ -6,6 +6,8 @@ import {UserContactService} from './services/user-contact.service';
 import {ContactMessageService} from './services/contact-message.service';
 import {UserContactController} from './controllers/user-contact.controller';
 import {ContactMessageController} from './controllers/contact-message.controller';
+import {ProfileService} from './services/profile.service';
+import {UsersGateway} from './gateways/users.gateway';
 
 @Module({
     controllers: [
@@ -17,6 +19,8 @@ import {ContactMessageController} from './controllers/contact-message.controller
     providers: [
         UserContactService,
         ContactMessageService,
+        ProfileService,
+        UsersGateway,
         MessagesGateway,
     ]
 

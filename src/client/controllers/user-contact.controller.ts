@@ -71,24 +71,6 @@ export class UserContactController
         }
     }
 
-    @Put(':id/:state')
-    async changeBlockStatus(
-        @Param('id', new ParameterConverterPipe('UserContact', 'id')) contact: UserContact,
-        @Param('state') state: number,
-        @CurrentUser() user,
-    )
-    {
-        const isBlocking = Boolean(state);
-        if (isBlocking)
-        {
-            await this.service.blockContact(contact, user);
-        }
-        else
-        {
-            await this.service.unBlockContact(contact, user);
-        }
-    }
-
     @Put(':id/read')
     async readLastMessages(
         @Param('id', new ParameterConverterPipe('UserContact', 'id')) contact: UserContact,

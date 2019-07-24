@@ -9,6 +9,7 @@ import {LanguageSkill} from '../../core/models/language-skill.model';
 import {FileInterceptor} from '@nestjs/platform-express';
 import {ImageThumbService} from '../../core/services/image-thumb.service';
 import {UploadManagerService} from '../../core/services/upload-manager.service';
+import {ProfileService} from '../services/profile.service';
 
 // TODO find the way of arranging nested routes
 @Controller('client/profile')
@@ -20,6 +21,7 @@ export class ProfileController
         @Inject('LanguageSkill') private readonly languageSkillModel: Model<LanguageSkill>,
         private readonly thumbService: ImageThumbService,
         private readonly uploadManager: UploadManagerService,
+        private readonly service: ProfileService
     ) {}
 
 
@@ -122,5 +124,48 @@ export class ProfileController
         catch (e) {}
 
         return user.serialize(['mine']);
+    }
+
+    @Post(':id/:status')
+    async changeProfileBlockStatus(
+        @Param('id', new ParameterConverterPipe('ClientUser', 'id')) user: ClientUser,
+        @Param('status') status: string,
+        @CurrentUser() currentUser
+    )
+    {
+        if (status === 'block')
+        {
+            await this.service.blockUser(currentUser, user);
+        }
+        else
+        {
+            await this.service.unBlockUser(currentUser, user);
+        }
+    }
+
+    @Get('am-i-blocked-by/:id')
+    async amIBlockedByUser(
+        @Param('id', new ParameterConverterPipe('ClientUser', 'id')) user: ClientUser,
+        @CurrentUser() currentUser
+    )
+    {
+        const result = await this.service.isAddresseeBlocked(user, currentUser);
+
+        return {
+            result
+        };
+    }
+
+    @Get('is-user-blocked/:id')
+    async isUserBlockedByMe(
+        @Param('id', new ParameterConverterPipe('ClientUser', 'id')) user: ClientUser,
+        @CurrentUser() currentUser
+    )
+    {
+        const result = await this.service.isAddresseeBlocked(currentUser, user);
+
+        return {
+            result
+        };
     }
 }

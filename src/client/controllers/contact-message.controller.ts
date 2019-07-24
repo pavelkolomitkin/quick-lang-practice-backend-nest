@@ -26,8 +26,6 @@ export class ContactMessageController
         @Query('page', PageParamPipe) page: number = 1
     )
     {
-        console.log('Last date is :');
-        console.log(lastDate);
         try {
             const messages = await this
                 .service
@@ -64,8 +62,6 @@ export class ContactMessageController
     {
         try {
             const message = await this.service.create(data, addressee, user);
-
-
             return {
                 message: { ...message.serialize(), author: user.serialize() }
             }

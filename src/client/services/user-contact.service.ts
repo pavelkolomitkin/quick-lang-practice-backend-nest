@@ -5,13 +5,15 @@ import {User} from '../../core/models/user.model';
 import {CoreException} from '../../core/exceptions/core.exception';
 import {ContactMessage} from '../../core/models/contact-message.model';
 import {async} from 'rxjs/internal/scheduler/async';
+import {ProfileService} from './profile.service';
 
 @Injectable()
 export class UserContactService
 {
     constructor(
         @Inject('UserContact') private readonly model: Model<UserContact>,
-        @Inject('User') private readonly userModel: Model<User>
+        @Inject('User') private readonly userModel: Model<User>,
+        private readonly profileService: ProfileService
     ) {}
 
     getListQuery(user: User)
@@ -42,54 +44,9 @@ export class UserContactService
         await contact.remove();
     }
 
-    async isAddresseeBlocked(user: User, addressee: User)
-    {
-        return !!await this.userModel.findOne({
-            _id: user.id,
-            blackList: addressee
-        });
-    }
-
-    async blockContact(contact: UserContact, user: User)
-    {
-        await this.userModel.populate('addressee', contact);
-
-        const isBlocked = await this.isAddresseeBlocked(user, contact.addressee);
-
-        if (!isBlocked)
-        {
-            await this.userModel.updateOne(
-                {
-                    _id: user.id,
-                },
-                {
-                    $push: { blackList: contact.addressee }
-                });
-        }
-    }
-
-    async unBlockContact(contact: UserContact, user: User)
-    {
-        await this.userModel.populate('addressee', contact);
-
-        const isBlocked = await this.isAddresseeBlocked(user, contact.addressee);
-
-        if (isBlocked)
-        {
-            await this.userModel.updateOne(
-                {
-                    _id: user.id
-                },
-                {
-                    $pull: { blackList: contact.addressee }
-                }
-            );
-        }
-    }
-
     async create(user: User, addressee: User)
     {
-        let isBlocked = await this.isAddresseeBlocked(addressee, user);
+        let isBlocked = await this.profileService.isAddresseeBlocked(user, addressee);
         if (isBlocked)
         {
             throw new CoreException();
