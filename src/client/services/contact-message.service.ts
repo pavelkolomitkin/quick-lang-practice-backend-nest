@@ -138,7 +138,6 @@ export class ContactMessageService
         }
 
         const contacts: UserContact[] = await this.contactService.getMessageContacts(message);
-
         await this.contactService.removeNewMessageFromContacts(message);
         await this.contactService.removeLastMessageFromContacts(message);
 
@@ -159,10 +158,5 @@ export class ContactMessageService
             }
 
         }
-    }
-
-    async read()
-    {
-
     }
 }

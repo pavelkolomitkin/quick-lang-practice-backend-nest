@@ -35,6 +35,17 @@ export class UserContactController
         };
     }
 
+    @Get('new-message-number')
+    async getNewMessageNumber(
+        @CurrentUser() user,
+    )
+    {
+        const result = await this.service.getNewMessageNumber(user);
+        return {
+            number: result
+        };
+    }
+
     @Get(':userId')
     async getContact(
         @Param('userId', new ParameterConverterPipe('ClientUser', 'id')) addressee: ClientUser,
@@ -84,4 +95,5 @@ export class UserContactController
             throw new NotFoundException();
         }
     }
+
 }

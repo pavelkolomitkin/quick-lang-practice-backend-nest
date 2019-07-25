@@ -15,6 +15,8 @@ import {ContactMessage} from '../../core/models/contact-message.model';
 import {ContactMessageLogActions} from '../../core/schemas/contact-message-log.schema';
 import {UserActivity} from '../../core/models/user-activity.model';
 import {ActivityTypes} from '../../core/schemas/user-activity.schema';
+import {UserContact} from '../../core/models/user-contact.model';
+import {UserContactService} from '../services/user-contact.service';
 
 
 @Injectable()
@@ -30,6 +32,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         @Inject('ContactMessageLog') private readonly messageLogModel: Model<ContactMessageLog>,
         @Inject('ContactMessage') private readonly messageModel: Model<ContactMessage>,
         @Inject('UserActivity') private readonly userActivityModel: Model<UserActivity>,
+        @Inject('UserContact') private readonly userContactModel: Model<UserContact>,
+        private userContactService: UserContactService,
         private guard: WsJwtGuard,
     ) {}
 
@@ -108,6 +112,31 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             }
         });
 
+
+        // @ts-ignore
+        client.userNewMessageNumberStream = this
+            .userContactModel
+            .watch([
+                {
+                    $match: {
+                        'fullDocument.user': new Types.ObjectId(user.id)
+                    },
+                },
+                {
+                    $project: {
+                        'newMessages': '$fullDocument.newMessages'
+                    }
+                }
+            ], { fullDocument: 'updateLookup' });
+
+        // @ts-ignore
+        client.userNewMessageNumberStream.on('change', async (data) => {
+
+            const newMessageNumber = await this.userContactService.getNewMessageNumber(user);
+            // @ts-ignore
+            client.emit('new_message_number', newMessageNumber);
+        });
+
         // @ts-ignore
         client.userActivityStream = this
             .userActivityModel
@@ -142,6 +171,8 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             }
 
         });
+
+
     }
 
     handleDisconnect(client: Client): any
@@ -152,6 +183,11 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         client.messageStream.close();
         // @ts-ignore
         client.messageStream = null;
+
+        // @ts-ignore
+        client.userNewMessageNumberStream.close();
+        // @ts-ignore
+        client.userNewMessageNumberStream = null;
 
         // @ts-ignore
         client.userActivityStream.close();

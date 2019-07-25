@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {Inject, Injectable} from '@nestjs/common';
 import {UserContact} from '../../core/models/user-contact.model';
 import {User} from '../../core/models/user.model';
@@ -75,9 +75,10 @@ export class UserContactService
     {
         await this.model.update(
             {
-              _id: { $in: message.contacts }
+              _id: { $in: message.contacts.map(item => new Types.ObjectId(item.id)) }
             },
-            { $pull: { newMessages: { _id: message.id } } }
+            { $pull: { newMessages: new Types.ObjectId(message.id) } },
+            { multi: true }
             );
     }
 
@@ -85,12 +86,13 @@ export class UserContactService
     {
         await this.model.update(
             {
-                _id: {$in: message.contacts},
-                lastMessage: message.id
+                _id: {$in: message.contacts.map(item => new Types.ObjectId(item.id))},
+                lastMessage: new Types.ObjectId(message.id)
             },
             {
                 lastMessage: null
-            }
+            },
+            { multi: true }
         );
     }
 
@@ -111,5 +113,35 @@ export class UserContactService
         const populated: ContactMessage = await this.model.populate(message, { path: 'contacts' });
 
         return populated.contacts;
+    }
+
+    async getNewMessageNumber(user: User)
+    {
+        const data = await this.model.aggregate([
+            {
+                $match: {
+                    user: new Types.ObjectId(user.id)
+                }
+            },
+
+            {
+                $group: {
+                    _id: null,
+                    total: {
+                        $sum: {
+                            $size: '$newMessages'
+                        }
+                    }
+                }
+            }
+        ]);
+
+        let result = 0;
+        if (data.length > 0)
+        {
+            result = data[0].total ? data[0].total : 0
+        }
+
+        return result;
     }
 }
