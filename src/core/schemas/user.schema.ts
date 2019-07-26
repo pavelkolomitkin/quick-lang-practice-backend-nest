@@ -20,6 +20,11 @@ const UserSchema = new Schema(
             type: {},
             default: null,
         },
+        blackList: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            select: false
+        }]
     },
     {
         timestamps: true,

@@ -61,7 +61,6 @@ export class LanguageSkillController
         @CurrentUser() user: ClientUser
         )
     {
-        debugger
         if (skill.user.toString() !== user.id.toString())
         {
             throw new BadRequestException('You can not edit this skill!');

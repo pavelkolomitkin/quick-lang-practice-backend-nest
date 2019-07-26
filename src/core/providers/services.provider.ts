@@ -11,7 +11,21 @@ export const services: Provider[] = [
         inject: [ConfigService],
         useFactory: async (configService: ConfigService): Promise<typeof mongoose> => {
             const dbConfig = configService.getMongoConfig();
+
             await mongoose.connect(dbConfig.uri, dbConfig.options);
+            // try {
+            //     await mongoose.connect('mongodb://mongodb-service:27017/qlp_practice', {
+            //         useNewUrlParser: true,
+            //         replicaSet: 'rs_qlp'
+            //     });
+            //
+            // }
+            // catch (e) {
+            //     debugger
+            //     console.log(e);
+            //     throw e;
+            // }
+
             mongoose.set('toJSON', { virtuals: true });
             mongoose.set('toObject', { virtuals: true });
 

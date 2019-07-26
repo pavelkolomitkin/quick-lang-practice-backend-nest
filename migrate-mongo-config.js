@@ -6,11 +6,10 @@ const config = {
 
     url: dbConfig.uri,
 
-    databaseName: dbConfig.options.dbName,
+    databaseName: dbConfig.databaseName,
 
     options: dbConfig.options
   },
-
   // The migrations dir, can be an relative or absolute path. Only edit this when really necessary.
   migrationsDir: "migrations",
 

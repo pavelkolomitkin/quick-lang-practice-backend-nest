@@ -1,17 +1,17 @@
 import { Model } from 'mongoose';
 import * as sha256 from 'crypto-js/sha256';
-import {UserRegisterDto} from './dto/user-register.dto';
+import {UserRegisterDto} from '../dto/user-register.dto';
 import {BadRequestException, Inject, Injectable} from '@nestjs/common';
-import {ClientUser} from '../core/models/client-user.model';
+import {ClientUser} from '../../core/models/client-user.model';
 import { hash, compare } from 'bcrypt';
-import {IMailService} from '../core/services/mail-service.interface';
-import {RegisterKey} from '../core/models/register-key.model';
-import {UserConfirmRegisterDto} from './dto/user-confirm-register.dto';
-import {UserRestorePasswordRequestDto} from './dto/user-restore-password-request.dto';
-import {User} from '../core/models/user.model';
-import {PasswordRestoreKey} from '../core/models/password-restore-key.model';
-import {UserRestorePasswordDto} from './dto/user-restore-password.dto';
-import {UserCredentialsDto} from './dto/user-credentials.dto';
+import {IMailService} from '../../core/services/mail-service.interface';
+import {RegisterKey} from '../../core/models/register-key.model';
+import {UserConfirmRegisterDto} from '../dto/user-confirm-register.dto';
+import {UserRestorePasswordRequestDto} from '../dto/user-restore-password-request.dto';
+import {User} from '../../core/models/user.model';
+import {PasswordRestoreKey} from '../../core/models/password-restore-key.model';
+import {UserRestorePasswordDto} from '../dto/user-restore-password.dto';
+import {UserCredentialsDto} from '../dto/user-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
