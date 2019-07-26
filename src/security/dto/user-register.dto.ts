@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, MinLength, Validate} from 'class-validator';
+import {IsEmail, IsNotEmpty, MaxLength, MinLength, Validate} from 'class-validator';
 import {UniqueUserEmailValidator} from '../validators/unique-user-email.validator';
 import {UserPasswordsEqualValidator} from '../validators/user-passwords-equal.validator';
 
@@ -16,6 +16,6 @@ export class UserRegisterDto {
     public passwordRepeat: string;
 
     @IsNotEmpty()
+    @MaxLength(100, { message: 'Maximum 100 symbols!' })
     public fullName: string;
-
 }
