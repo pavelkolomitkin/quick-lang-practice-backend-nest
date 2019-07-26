@@ -1,4 +1,6 @@
 import { Schema } from 'mongoose';
+import * as mongooseDelete from 'mongoose-delete';
+import { aggregate } from '../middlewares/soft-delete-entity.middleware';
 
 const UserContactSchema = new Schema({
     user: {
@@ -19,6 +21,11 @@ const UserContactSchema = new Schema({
     lastMessage: {
         type: Schema.Types.ObjectId,
         ref: 'ContactMessage'
+    },
+
+    lastMessageAddedAt: {
+        type: Date,
+        default: new Date()
     }
 },
     {
@@ -26,5 +33,8 @@ const UserContactSchema = new Schema({
     }
 );
 
+UserContactSchema.plugin(mongooseDelete, { deletedAt : true, overrideMethods: 'all' });
+
+UserContactSchema.pre('aggregate', aggregate);
 
 export { UserContactSchema };

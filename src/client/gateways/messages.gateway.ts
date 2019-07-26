@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { Model, Types } from 'mongoose';
 import {
     OnGatewayConnection,
@@ -17,6 +18,7 @@ import {UserActivity} from '../../core/models/user-activity.model';
 import {ActivityTypes} from '../../core/schemas/user-activity.schema';
 import {UserContact} from '../../core/models/user-contact.model';
 import {UserContactService} from '../services/user-contact.service';
+import {ClientUser} from '../../core/models/client-user.model';
 
 
 @Injectable()
@@ -33,6 +35,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         @Inject('ContactMessage') private readonly messageModel: Model<ContactMessage>,
         @Inject('UserActivity') private readonly userActivityModel: Model<UserActivity>,
         @Inject('UserContact') private readonly userContactModel: Model<UserContact>,
+        @Inject('ClientUser') private readonly userModel: Model<ClientUser>,
         private userContactService: UserContactService,
         private guard: WsJwtGuard,
     ) {}
@@ -58,8 +61,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                     'fullDocument.addressee': new Types.ObjectId(user.id)
                 } },
             ]);
-
-
         // @ts-ignore
         client.messageStream.on('change', async (message) => {
 
@@ -87,20 +88,35 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                 author
             };
 
-            //console.log(message);
-
+            const addressee = await this.userModel.findById(fullDocument.actor.toString());
+            const addresseeContact = await this.userContactService.getContact(user, addressee);
+            await this.userContactModel.populate(addresseeContact, { path: 'lastMessage' });
+            const addresseeContactResult = {
+                ...addresseeContact.serialize(),
+                addressee: _.omit(addressee.serialize(), ['skills']),
+                lastMessage: addresseeContact.lastMessage ? addresseeContact.lastMessage.serialize() : null
+            };
+            // console.log('addresseeContactResult:');
+            // console.log(addresseeContactResult);
             switch (fullDocument.action) {
 
                 case ContactMessageLogActions.ADD:
 
                     // @ts-ignore
                     client.emit('message_new', messageEntity);
+
+                    //@ts-ignore
+                    client.emit('user_contact_new_message', addresseeContactResult);
+
                     break;
 
                 case ContactMessageLogActions.EDIT:
 
                     // @ts-ignore
                     client.emit('message_edited', messageEntity);
+
+                    // @ts-ignore
+                    client.emit('user_contact_message_edited', addresseeContactResult);
                     break;
 
                 case ContactMessageLogActions.REMOVE:
@@ -108,10 +124,13 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                     //console.log('MESSAGE HAS BEEN REMOVED!');
                     // @ts-ignore
                     client.emit('message_remove', messageEntity);
+
+                    // @ts-ignore
+                    client.emit('user_contact_message_removed', addresseeContactResult);
+
                     break;
             }
         });
-
 
         // @ts-ignore
         client.userNewMessageNumberStream = this
@@ -121,14 +140,10 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                     $match: {
                         'fullDocument.user': new Types.ObjectId(user.id)
                     },
-                },
-                {
-                    $project: {
-                        'newMessages': '$fullDocument.newMessages'
-                    }
                 }
-            ], { fullDocument: 'updateLookup' });
-
+            ],
+                { fullDocument: 'updateLookup' }
+                );
         // @ts-ignore
         client.userNewMessageNumberStream.on('change', async (data) => {
 
@@ -152,7 +167,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         // @ts-ignore
         client.userActivityStream.on('change', async (activity) => {
 
-            console.log('USER IS TYPING...');
+            //console.log('USER IS TYPING...');
             const { fullDocument } = activity;
             await this.userActivityModel.populate(fullDocument, { path: 'user' });
 
@@ -171,8 +186,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             }
 
         });
-
-
     }
 
     handleDisconnect(client: Client): any
@@ -219,10 +232,10 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @SubscribeMessage('typing')
     async handleUserTyping(client: Client, data: { addresseeId: string })
     {
-        console.log('USER POST TYPING...');
-        console.log('addressee: ' + data.addresseeId);
+        //console.log('USER POST TYPING...');
+        // console.log('addressee: ' + data.addresseeId);
         // @ts-ignore
-        console.log('user: ' + client.user.id);
+        // console.log('user: ' + client.user.id);
 
         await this.userActivityModel.updateOne(
             {

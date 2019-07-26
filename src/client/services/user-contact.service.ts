@@ -4,7 +4,6 @@ import {UserContact} from '../../core/models/user-contact.model';
 import {User} from '../../core/models/user.model';
 import {CoreException} from '../../core/exceptions/core.exception';
 import {ContactMessage} from '../../core/models/contact-message.model';
-import {async} from 'rxjs/internal/scheduler/async';
 import {ProfileService} from './profile.service';
 
 @Injectable()
@@ -16,20 +15,35 @@ export class UserContactService
         private readonly profileService: ProfileService
     ) {}
 
-    getListQuery(user: User)
+    getListQuery(user: User, criteria: any)
     {
-        return this.model.find({
+        const filter = {
             user: user.id
-        })
-            .sort({'updatedAt': 0});
+        };
 
+        this.handleLastMessageAddedAt(filter, criteria);
+
+        return this
+            .model
+            .find(filter)
+            .sort({'lastMessageAddedAt': -1});
+    }
+
+    private handleLastMessageAddedAt(filter: any, criteria: any)
+    {
+        if (criteria.lastMessageAddedAt)
+        {
+            filter.lastMessageAddedAt = {
+                $lt: criteria.lastMessageAddedAt
+            };
+        }
     }
 
     async getContact(user: User, addressee: User)
     {
         return await this.model.findOne({
-            user: user.id,
-            addressee: addressee.id
+            user: user.id.toString(),
+            addressee: addressee.id.toString()
         });
     }
 
@@ -41,7 +55,7 @@ export class UserContactService
         }
 
         // @ts-ignore
-        await contact.remove();
+        await contact.delete();
     }
 
     async create(user: User, addressee: User)

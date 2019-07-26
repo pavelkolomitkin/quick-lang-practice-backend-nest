@@ -6,6 +6,7 @@ import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe'
 import {PageParamPipe} from '../../core/pipes/page-param.pipe';
 import {UserContactService} from '../services/user-contact.service';
 import {ClientUser} from '../../core/models/client-user.model';
+import {DateTimePipe} from '../../core/pipes/date-time.pipe';
 
 @Injectable()
 @Controller('client/contact')
@@ -19,19 +20,29 @@ export class UserContactController
     @Get('list')
     async getList(
         @CurrentUser() user,
-        @Query('page', PageParamPipe) page: number = 1
+        @Query('lastDate', DateTimePipe) lastDate: Date,
     )
     {
         const contacts = await this
             .service
-            .getListQuery(user)
+            .getListQuery(user, {lastMessageAddedAt: lastDate})
             .populate('newMessages')
             .populate('addressee')
             .populate('lastMessage')
-            .skip(page * 10).limit(10);
-
+            .limit(10);
         return {
-            contacts: contacts.map(item => item.serialize())
+            contacts: contacts.map((item) => {
+
+                const { newMessages, addressee, lastMessage } = item;
+
+                return {
+                  ...item.serialize(),
+                    newMessages,
+                    addressee: addressee.serialize(),
+                    lastMessage: lastMessage ? lastMessage.serialize() : null
+                }
+
+            })
         };
     }
 

@@ -20,6 +20,9 @@ export class UserContact extends BaseEntityModel implements Document
     lastMessage: ContactMessage;
 
     @Expose()
+    lastMessageAddedAt: Date;
+
+    @Expose()
     createdAt: string;
 
     @Expose()

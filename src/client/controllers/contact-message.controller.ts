@@ -22,8 +22,7 @@ export class ContactMessageController
     async getContactMessages(
         @Param('id', new ParameterConverterPipe('UserContact', 'id')) contact: UserContact,
         @CurrentUser() user,
-        @Query('lastDate', DateTimePipe) lastDate: Date,
-        @Query('page', PageParamPipe) page: number = 1
+        @Query('lastDate', DateTimePipe) lastDate: Date
     )
     {
         try {
@@ -34,8 +33,6 @@ export class ContactMessageController
                 })
                 .populate('author')
                 .limit(20);
-                // .skip((page - 1) * 10)
-                // .limit(10);
 
             return {
                 messages: messages.map((message) => {

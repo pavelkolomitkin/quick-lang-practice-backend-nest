@@ -79,9 +79,11 @@ export class ContactMessageService
 
         addresseeContact.newMessages.push(result);
         addresseeContact.lastMessage = result;
+        addresseeContact.lastMessageAddedAt = new Date();
         await addresseeContact.save();
 
         userContact.lastMessage = result;
+        userContact.lastMessageAddedAt = new Date();
         await userContact.save();
 
         const log = new this.logModel({
@@ -113,7 +115,7 @@ export class ContactMessageService
 
         for (const contact of contacts)
         {
-            if (contact.user !== owner.id)
+            if (contact.user.toString() !== owner.id)
             {
                 const log = new this.logModel({
                     message: message,
@@ -146,9 +148,10 @@ export class ContactMessageService
 
         for (const contact of contacts)
         {
-            if (contact.user !== owner.id)
+            if (contact.user.toString() !== owner.id)
             {
                 const log = new this.logModel({
+                    actor: owner,
                     message: message,
                     addressee: contact.user,
                     action: ContactMessageLogActions.REMOVE

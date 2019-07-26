@@ -1,5 +1,6 @@
 import { Schema } from 'mongoose';
 import * as mongooseDelete from 'mongoose-delete';
+import { aggregate } from '../middlewares/soft-delete-entity.middleware';
 
 const ContactMessageSchema = new Schema({
     text: {
@@ -20,5 +21,6 @@ const ContactMessageSchema = new Schema({
 );
 
 ContactMessageSchema.plugin(mongooseDelete, { deletedAt : true, overrideMethods: 'all' });
+ContactMessageSchema.pre('aggregate', aggregate);
 
 export { ContactMessageSchema };
