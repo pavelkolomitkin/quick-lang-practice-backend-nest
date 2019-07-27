@@ -14,6 +14,11 @@ const ClientUserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'LanguageSkill',
     },
+
+    practiceSessions: [{
+        type: Schema.Types.ObjectId,
+        ref: 'PracticeSession',
+    }],
 },
 {
     discriminatorKey: 'kind',

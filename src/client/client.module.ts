@@ -8,6 +8,9 @@ import {UserContactController} from './controllers/user-contact.controller';
 import {ContactMessageController} from './controllers/contact-message.controller';
 import {ProfileService} from './services/profile.service';
 import {UsersGateway} from './gateways/users.gateway';
+import {PracticeSessionsGateway} from './gateways/practice-sessions.gateway';
+import {PracticeSessionController} from './controllers/practice-session.controller';
+import {PracticeSessionService} from './services/practice-session.service';
 
 @Module({
     controllers: [
@@ -15,13 +18,16 @@ import {UsersGateway} from './gateways/users.gateway';
         LanguageSkillController,
         UserContactController,
         ContactMessageController,
+        PracticeSessionController,
     ],
     providers: [
         UserContactService,
         ContactMessageService,
         ProfileService,
+        PracticeSessionService,
         UsersGateway,
         MessagesGateway,
+        PracticeSessionsGateway
     ]
 
 })

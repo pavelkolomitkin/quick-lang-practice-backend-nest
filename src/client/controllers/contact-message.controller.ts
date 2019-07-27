@@ -3,7 +3,6 @@ import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe'
 import {UserContact} from '../../core/models/user-contact.model';
 import {AuthGuard} from '@nestjs/passport';
 import {User as CurrentUser} from '../../core/decorators/user.decorator';
-import {PageParamPipe} from '../../core/pipes/page-param.pipe';
 import {ContactMessage} from '../../core/models/contact-message.model';
 import {User} from '../../core/models/user.model';
 import {ContactMessageDto} from '../dto/contact-message.dto';

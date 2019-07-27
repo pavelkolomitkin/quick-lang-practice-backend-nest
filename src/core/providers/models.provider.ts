@@ -23,6 +23,10 @@ import {ContactMessageLogSchema} from '../schemas/contact-message-log.schema';
 import {ContactMessageLog} from '../models/contact-message-log.model';
 import {UserActivitySchema} from '../schemas/user-activity.schema';
 import {UserActivity} from '../models/user-activity.model';
+import {PracticeSessionStatus} from '../models/practice-session-status.model';
+import {PracticeSessionStatusSchema} from '../schemas/practice-session-status.schema';
+import {PracticeSessionSchema} from '../schemas/practice-session.schema';
+import {PracticeSession} from '../models/practice-session.model';
 
 const serialize = function(modelClass, groups: string[] = []) {
 
@@ -167,5 +171,26 @@ export const models: Provider[] = [
             UserActivitySchema.methods.serialize = createSerializer([UserActivity]);
             return connection.model('UserActivity', UserActivitySchema);
         }
-    }
+    },
+    {
+        provide: 'PracticeSessionStatus',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => {
+
+            PracticeSessionStatusSchema.methods.serialize = createSerializer([PracticeSessionStatus]);
+            return connection.model('PracticeSessionStatus', PracticeSessionStatusSchema);
+
+        }
+    },
+    {
+        provide: 'PracticeSession',
+        inject: ['DATABASE_CONNECTION'],
+        useFactory: (connection: Connection) => {
+
+            PracticeSessionSchema.methods.serialize = createSerializer([PracticeSession]);
+            return connection.model('PracticeSession', PracticeSessionSchema);
+
+        }
+    },
+
 ];
