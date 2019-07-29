@@ -12,7 +12,13 @@ export class PracticeSession extends BaseEntityModel implements Document
     caller: User;
 
     @Expose()
+    callerPeer: string;
+
+    @Expose()
     callee: User;
+
+    @Expose()
+    calleePeer: string;
 
     @Expose()
     skill: LanguageSkill;

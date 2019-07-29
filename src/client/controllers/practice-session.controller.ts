@@ -1,4 +1,4 @@
-import {BadRequestException, Controller, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {User as CurrentUser} from '../../core/decorators/user.decorator';
 import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe';
@@ -20,11 +20,12 @@ export class PracticeSessionController
     async init(
         @Param('addressee', new ParameterConverterPipe('User', 'id')) addressee: User,
         @Param('skill', new ParameterConverterPipe('LanguageSkill', 'id')) skill: LanguageSkill,
+        @Body('peer') peer: string,
         @CurrentUser() user,
     )
     {
         try {
-            const session = await this.service.init(user, addressee, skill);
+            const session = await this.service.init(user, addressee, skill, peer);
 
             return {
                 session: this.serializeSession(session)
@@ -60,11 +61,12 @@ export class PracticeSessionController
     @Put('accept/:id')
     async accept(
         @Param('id', new ParameterConverterPipe('PracticeSession', 'id') ) session: PracticeSession,
+        @Body('peer') peer: string,
         @CurrentUser() user,
     )
     {
         try {
-            await this.service.accept(session, user);
+            await this.service.accept(session, user, peer);
             return {
                 session: this.serializeSession(session)
             };

@@ -10,10 +10,19 @@ const PracticeSessionSchema = new Schema({
         autopopulate: true
     },
 
+    callerPeer: {
+        type: String
+    },
+
+
     callee: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         autopopulate: true
+    },
+
+    calleePeer: {
+        type: String
     },
 
     skill: {

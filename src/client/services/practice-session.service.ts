@@ -6,16 +6,18 @@ import {PracticeSession} from '../../core/models/practice-session.model';
 import {PracticeSessionStatus} from '../../core/models/practice-session-status.model';
 import {PracticeSessionStatusCodes} from '../../core/schemas/practice-session-status.schema';
 import {LanguageSkill} from '../../core/models/language-skill.model';
+import {ProfileService} from './profile.service';
 
 @Injectable()
 export class PracticeSessionService
 {
     constructor(
         @Inject('PracticeSession') private readonly model: Model<PracticeSession>,
-        @Inject('PracticeSessionStatus') private readonly statusModel: Model<PracticeSessionStatus>
+        @Inject('PracticeSessionStatus') private readonly statusModel: Model<PracticeSessionStatus>,
+        private profileService: ProfileService
     ) {}
 
-    async init(user: User, addressee: User, skill: LanguageSkill)
+    async init(user: User, addressee: User, skill: LanguageSkill, peer: string)
     {
         if (user.id === addressee.id)
         {
@@ -26,6 +28,19 @@ export class PracticeSessionService
         {
             throw new CoreException('Wrong skill parameter!');
         }
+
+        const isUserBlocked = await this.profileService.isAddresseeBlocked(addressee, user);
+        if (isUserBlocked)
+        {
+            throw new CoreException('The user has blocked you!');
+        }
+
+        const isAddresseeBlocked = await this.profileService.isAddresseeBlocked(user, addressee);
+        if (isAddresseeBlocked)
+        {
+            throw new CoreException('You have blocked the user!');
+        }
+
 
         // TODO: consider the case when user is online/offline
         // if user is not online
@@ -45,6 +60,7 @@ export class PracticeSessionService
         const initializedStatus = await this.getStatusByCode(PracticeSessionStatusCodes.INITIALIZED);
         const result = new this.model({
             caller: user,
+            callerPeer: peer,
             callee: addressee,
             status: initializedStatus,
             skill: skill
@@ -81,7 +97,7 @@ export class PracticeSessionService
         throw new CoreException('The session is already ended!');
     }
 
-    async accept(session: PracticeSession, user: User)
+    async accept(session: PracticeSession, user: User, peer: string)
     {
         this.validateMember(session, user);
 
@@ -89,7 +105,7 @@ export class PracticeSessionService
         {
             session.status = await this.getStatusByCode(PracticeSessionStatusCodes.IN_PROCESS);
             session.progressStartTime = new Date();
-
+            session.calleePeer = peer;
             //@ts-ignore
             await session.save();
 
@@ -144,12 +160,14 @@ export class PracticeSessionService
     validateMember(session: PracticeSession, member: User)
     {
         if (
-            (session.callee.toString() !== member.id) ||
-            (session.caller.toString() !== member.id)
+            (session.callee.id.toString() === member.id) ||
+            (session.caller.id.toString() === member.id)
         )
         {
-            throw new CoreException('You are not a member');
+            return;
         }
+
+        throw new CoreException('You are not a member');
     }
 
     async isUserBusy(user: User)
