@@ -11,6 +11,8 @@ import {UsersGateway} from './gateways/users.gateway';
 import {PracticeSessionsGateway} from './gateways/practice-sessions.gateway';
 import {PracticeSessionController} from './controllers/practice-session.controller';
 import {PracticeSessionService} from './services/practice-session.service';
+import {SearchPartnerService} from './services/search-partner.service';
+import {SearchPartnerController} from './controllers/search-partner.controller';
 
 @Module({
     controllers: [
@@ -19,12 +21,14 @@ import {PracticeSessionService} from './services/practice-session.service';
         UserContactController,
         ContactMessageController,
         PracticeSessionController,
+        SearchPartnerController
     ],
     providers: [
         UserContactService,
         ContactMessageService,
         ProfileService,
         PracticeSessionService,
+        SearchPartnerService,
         UsersGateway,
         MessagesGateway,
         PracticeSessionsGateway
