@@ -7,6 +7,7 @@ import {JwtPayload} from './models/jwt-payload.model';
 import {InjectModel} from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {ClientUser} from '../core/models/client-user.model';
+import {User} from '../core/models/user.model';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy)
@@ -30,6 +31,14 @@ export class JwtStrategy extends PassportStrategy(Strategy)
             throw new UnauthorizedException();
         }
 
+        await this.updateLastActivity(user);
         return user;
+    }
+
+    async updateLastActivity(user: User)
+    {
+        user.lastActivity = new Date();
+        // @ts-ignore
+        await user.save();
     }
 }

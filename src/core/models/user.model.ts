@@ -29,4 +29,7 @@ export class User extends BaseEntityModel implements Document {
 
     @Expose()
     roles: string[];
+
+    @Expose()
+    lastActivity: Date;
 }
