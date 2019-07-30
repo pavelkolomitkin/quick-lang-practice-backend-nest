@@ -24,7 +24,11 @@ const UserSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
             select: false
-        }]
+        }],
+
+        lastActivity: {
+            type: Date,
+        }
     },
     {
         timestamps: true,

@@ -47,9 +47,6 @@ export class PracticeSessionsGateway implements OnGatewayInit, OnGatewayConnecti
         // @ts-ignore
         client.sessionStream.on('change', async ( data ) => {
 
-            console.log('PRACTICE SESSION HAS BEEN UPDATED...');
-            console.log(data);
-
             const { fullDocument } = data;
             const session = await this.practiceSessionModel.findById(fullDocument._id)
                 .populate('caller')
@@ -87,8 +84,6 @@ export class PracticeSessionsGateway implements OnGatewayInit, OnGatewayConnecti
 
             if (sessionEventName)
             {
-
-                console.log(session);
                 // @ts-ignore
                 client.emit(sessionEventName, this.serializeSession(session));
             }

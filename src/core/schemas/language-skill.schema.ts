@@ -10,14 +10,14 @@ const LanguageSkillSchema = new Schema({
     },
 
     language: {
-        type: Schema.Types.ObjectId,
+        type: Number,
         ref: 'Language',
         required: true,
         autopopulate: true,
     },
 
     level: {
-        type: Schema.Types.ObjectId,
+        type: Number,
         ref: 'LanguageLevel',
         required: true,
         autopopulate: true,

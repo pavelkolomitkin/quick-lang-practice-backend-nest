@@ -27,7 +27,7 @@ module.exports = {
       await db.collection('languages').insertOne({_id: 21, code:'BI', name: 'Bislama'});
       await db.collection('languages').insertOne({_id: 22, code:'BR', name: 'Breton'});
       await db.collection('languages').insertOne({_id: 23, code:'BG', name: 'Bulgarian'});
-      await db.collection('languages').insertOne({_id: 24, code:'"M', name: '>Burmese'});
+      await db.collection('languages').insertOne({_id: 24, code:'M', name: 'Burmese'});
       await db.collection('languages').insertOne({_id: 25, code:'CA', name: 'Catalan'});
       await db.collection('languages').insertOne({_id: 26, code:'CB', name: 'Cebuano'});
       await db.collection('languages').insertOne({_id: 27, code:'CE', name: 'Chechen'});
