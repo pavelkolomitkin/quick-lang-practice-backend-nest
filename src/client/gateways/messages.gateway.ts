@@ -42,14 +42,11 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     afterInit(server: Server): any
     {
-        //console.log('AFTER INIT SERVER');
-
         this.guard.authorize(server);
     }
 
     handleConnection(client: Client, ...args: any[]): any
     {
-        //console.log('Client is connected!');
         // @ts-ignore
         const { user } = client;
         // @ts-ignore
@@ -96,8 +93,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
                 addressee: _.omit(addressee.serialize(), ['skills']),
                 lastMessage: addresseeContact.lastMessage ? addresseeContact.lastMessage.serialize() : null
             };
-            // console.log('addresseeContactResult:');
-            // console.log(addresseeContactResult);
+
             switch (fullDocument.action) {
 
                 case ContactMessageLogActions.ADD:
@@ -121,7 +117,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
                 case ContactMessageLogActions.REMOVE:
 
-                    //console.log('MESSAGE HAS BEEN REMOVED!');
                     // @ts-ignore
                     client.emit('message_remove', messageEntity);
 
@@ -167,7 +162,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         // @ts-ignore
         client.userActivityStream.on('change', async (activity) => {
 
-            //console.log('USER IS TYPING...');
             const { fullDocument } = activity;
             await this.userActivityModel.populate(fullDocument, { path: 'user' });
 
@@ -190,8 +184,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     handleDisconnect(client: Client): any
     {
-        //console.log('Client is disconnected!');
-
         // @ts-ignore
         client.messageStream.close();
         // @ts-ignore
@@ -232,11 +224,6 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     @SubscribeMessage('typing')
     async handleUserTyping(client: Client, data: { addresseeId: string })
     {
-        //console.log('USER POST TYPING...');
-        // console.log('addressee: ' + data.addresseeId);
-        // @ts-ignore
-        // console.log('user: ' + client.user.id);
-
         await this.userActivityModel.updateOne(
             {
                 addressee: new Types.ObjectId(data.addresseeId),
