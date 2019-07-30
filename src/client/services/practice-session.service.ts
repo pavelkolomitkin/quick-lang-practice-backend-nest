@@ -7,6 +7,7 @@ import {PracticeSessionStatus} from '../../core/models/practice-session-status.m
 import {PracticeSessionStatusCodes} from '../../core/schemas/practice-session-status.schema';
 import {LanguageSkill} from '../../core/models/language-skill.model';
 import {ProfileService} from './profile.service';
+import {ClientUser} from '../../core/models/client-user.model';
 
 @Injectable()
 export class PracticeSessionService
@@ -14,8 +15,60 @@ export class PracticeSessionService
     constructor(
         @Inject('PracticeSession') private readonly model: Model<PracticeSession>,
         @Inject('PracticeSessionStatus') private readonly statusModel: Model<PracticeSessionStatus>,
-        private profileService: ProfileService
+        @Inject('ClientUser') private readonly userModel: Model<ClientUser>,
+        private profileService: ProfileService,
     ) {}
+
+    async remove(session: PracticeSession, user: User)
+    {
+        this.validateMember(session, user);
+
+        await this.userModel.update(
+            {
+                _id: new Types.ObjectId(user.id)
+            },
+            {
+                $pull: {}
+            }
+            );
+
+    }
+
+    getListQuery(user: User, criteria: any)
+    {
+        const filter = {
+            $or: [
+                { caller: user.id },
+                { callee: user.id }
+            ]
+        };
+
+        this.handleLastCreatedAt(filter, criteria);
+        this.handleStatus(filter, criteria);
+
+        return this
+            .model
+            .find(filter)
+            .sort({ createdAt: -1 });
+    }
+
+    private handleStatus(filter: any, criteria: any)
+    {
+        if (criteria.status)
+        {
+            filter.status = status;
+        }
+    }
+
+    private handleLastCreatedAt(filter: any, criteria: any)
+    {
+        if (criteria.lastDate)
+        {
+            filter.createdAt = {
+                $lt: criteria.lastDate
+            };
+        }
+    }
 
     async init(user: User, addressee: User, skill: LanguageSkill, peer: string)
     {

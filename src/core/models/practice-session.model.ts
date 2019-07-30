@@ -31,4 +31,10 @@ export class PracticeSession extends BaseEntityModel implements Document
 
     @Expose()
     status: PracticeSessionStatus;
+
+    @Expose()
+    createdAt: string;
+
+    @Expose()
+    updatedAt: string;
 }

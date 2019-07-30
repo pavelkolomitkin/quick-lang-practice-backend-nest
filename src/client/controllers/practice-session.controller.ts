@@ -1,4 +1,4 @@
-import {BadRequestException, Body, Controller, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 import {User as CurrentUser} from '../../core/decorators/user.decorator';
 import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe';
@@ -7,14 +7,48 @@ import {PracticeSessionService} from '../services/practice-session.service';
 import {PracticeSession} from '../../core/models/practice-session.model';
 import {CoreException} from '../../core/exceptions/core.exception';
 import {LanguageSkill} from '../../core/models/language-skill.model';
+import {DateTimePipe} from '../../core/pipes/date-time.pipe';
 
 @Controller('client/practice-session')
 @UseGuards(AuthGuard())
 export class PracticeSessionController
 {
     constructor(
-        private service: PracticeSessionService
+        private service: PracticeSessionService,
     ) {}
+
+    @Get('list')
+    async getList(
+        @CurrentUser() user,
+        @Query('lastDate', DateTimePipe) lastDate: Date,
+        @Query('status') statusCode: string
+    )
+    {
+        const status = await this.service.getStatusByCode(statusCode);
+        const sessions = await this
+            .service
+            .getListQuery(user, {
+                lastDate: lastDate,
+                status: status
+            })
+            .populate('status')
+            .populate('caller')
+            .populate('callee')
+            .populate('skill')
+            .limit(10);
+
+        return {
+            sessions: sessions.map((session) => {
+
+                return {
+                    ...session.serialize(),
+                    caller: session.caller.serialize(),
+                    callee: session.callee.serialize(),
+                };
+
+            })
+        };
+    }
 
     @Post('init/:addressee/:skill')
     async init(
@@ -79,6 +113,15 @@ export class PracticeSessionController
 
             throw error;
         }
+    }
+
+    @Delete(':id')
+    async remove(
+        @Param('id', new ParameterConverterPipe('PracticeSession', 'id') ) session: PracticeSession,
+        @CurrentUser() user,
+    )
+    {
+
     }
 
     private serializeSession(session: PracticeSession)
