@@ -3,7 +3,6 @@ import {AuthGuard} from '@nestjs/passport';
 import {User as CurrentUser} from '../../core/decorators/user.decorator';
 import {UserContact} from '../../core/models/user-contact.model';
 import {ParameterConverterPipe} from '../../core/pipes/parameter-converter.pipe';
-import {PageParamPipe} from '../../core/pipes/page-param.pipe';
 import {UserContactService} from '../services/user-contact.service';
 import {ClientUser} from '../../core/models/client-user.model';
 import {DateTimePipe} from '../../core/pipes/date-time.pipe';
@@ -30,6 +29,7 @@ export class UserContactController
             .populate('addressee')
             .populate('lastMessage')
             .limit(10);
+
         return {
             contacts: contacts.map((item) => {
 

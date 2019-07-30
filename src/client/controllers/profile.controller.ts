@@ -49,8 +49,8 @@ export class ProfileController
     @Put('/')
     async edit(@Body() data: ProfileDto, @CurrentUser() profile: ClientUser)
     {
-        profile.aboutYourSelf = data.aboutYourSelf;
-
+        profile.aboutYourSelf = data.aboutYourSelf.trim();
+        profile.fullName = data.fullName.trim();
         // @ts-ignore
         await profile.save();
     }
