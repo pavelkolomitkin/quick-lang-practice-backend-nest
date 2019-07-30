@@ -49,8 +49,8 @@ export class SearchPartnerService
                     path: 'skills',
                     model: 'LanguageSkill'
                 }
-            });
-
+            })
+            .populate('readyToPracticeSkill');
 
         const result = userIds.map((userId) => {
             return users.find((user) => user.id === userId.toString());
