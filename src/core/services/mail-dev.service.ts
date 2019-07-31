@@ -22,4 +22,8 @@ export class MailDevService implements IMailService
         console.log(`Activation link: http://localhost:4200/security/register-confirm/${ registerKey.key }`);
     }
 
+    send(from: string, to: string, subject: string, body: string) {
+
+    }
+
 }

@@ -32,6 +32,11 @@ services:
       UPLOAD_DIRECTORY: '/app/upload'
       IMAGE_THUMB_DIRECTORY: '/app/thumbs'
       MAX_UPLOAD_FILE_SIZE: '7340032' # 7M
+      MAIL_HOST: 'smtp.localhost.ru'
+      MAIL_PORT: 25
+      MAIL_USER: test
+      MAIL_PASSWORD: test
+      EMAIL_NO_REPLY: 'noreply@localhost.ru'
 
   mongodb-service:
     image: mongo:4.0.10-xenial
@@ -42,25 +47,8 @@ services:
     volumes:
       - quick_lang_practice_db_dev:/data/db
     environment:
-#      MONGO_INITDB_ROOT_USERNAME: 'root'
-#      MONGO_INITDB_ROOT_PASSWORD: '1234'
       MONGO_INITDB_DATABASE: 'qlp_practice'
     command: mongod --replSet rs_qlp
-
-#  mongo-admin-service:
-#    image: mongo-express
-#    container_name: 'mongo-admin'
-#    ports:
-#      - '8081:8081'
-#    links:
-#      - mongodb-service
-#    environment:
-#      ME_CONFIG_MONGODB_SERVER: 'mongodb-service/rs0'
-#      ME_CONFIG_MONGODB_PORT: 30001
-#      ME_CONFIG_BASICAUTH_USERNAME: 'root'
-#      ME_CONFIG_BASICAUTH_PASSWORD: '1234'
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: 'root'
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: '1234'
 
 volumes:
   quick_lang_practice_db_dev:

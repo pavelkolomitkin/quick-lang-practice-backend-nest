@@ -52,7 +52,7 @@ export class SecurityService
         });
 
         await registerKey.save();
-        this.mailer.sendRegisterConfirmation(registerKey);
+        await this.mailer.sendRegisterConfirmation(registerKey);
 
         return result;
     }
@@ -93,7 +93,7 @@ export class SecurityService
             await restoreKey.save();
         }
 
-        this.mailer.sendPasswordRestoreLink(restoreKey);
+        await this.mailer.sendPasswordRestoreLink(restoreKey);
 
         return restoreKey;
     }

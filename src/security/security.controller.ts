@@ -16,10 +16,7 @@ import {UserRestorePasswordDto} from './dto/user-restore-password.dto';
 import {PasswordRestoreKeyValidator} from './validators/password-restore-key.validator';
 import {AuthGuard} from '@nestjs/passport';
 import {UserCredentialsDto} from './dto/user-credentials.dto';
-import {plainToClass, Type} from 'class-transformer';
-import {User} from '../core/models/user.model';
 import { User as CurrentUser } from '../core/decorators/user.decorator';
-import {ClientUser} from '../core/models/client-user.model';
 
 @Controller('security')
 export class SecurityController {
