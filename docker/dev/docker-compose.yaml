@@ -26,7 +26,6 @@ services:
       MONGO_DATABASE_PORT: '27017'
       MONGO_POOL_SIZE: '200'
       PORT: '3000'
-      NOREPLY_EMAIL: 'noreply@qlpractice.com'
       EMAIL_LINK_HOST: 'localhost:4200'
       UPLOAD_DIRECTORY: '/app/upload'
       IMAGE_THUMB_DIRECTORY: '/app/thumbs'

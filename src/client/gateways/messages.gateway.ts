@@ -90,7 +90,7 @@ export class MessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             await this.userContactModel.populate(addresseeContact, { path: 'lastMessage' });
             const addresseeContactResult = {
                 ...addresseeContact.serialize(),
-                addressee: _.omit(addressee.serialize(), ['skills']),
+                addressee: _.omit(addressee.serialize(), ['skills', 'readyToPracticeSkill']),
                 lastMessage: addresseeContact.lastMessage ? addresseeContact.lastMessage.serialize() : null
             };
 
