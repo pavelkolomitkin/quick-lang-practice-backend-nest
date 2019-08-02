@@ -19,7 +19,7 @@ services:
     command: 'npm run start:debug'
     hostname: 'node-app-service'
     environment:
-      APP_ENV: 'dev'
+      NODE_ENV: 'dev'
       APP_SECRET: 'change_it'
       MONGO_INITDB_ROOT_USERNAME: 'root'
       MONGO_INITDB_ROOT_PASSWORD: '1234'
