@@ -17,7 +17,9 @@ export class MailService implements IMailService
     constructor(
         private readonly config: ConfigService
     ) {
-        this.template = hbs.create();
+        this.template = hbs.create({
+            layoutsDir: __dirname + '../templates'
+        });
     }
 
     private async getTransporter()
@@ -99,6 +101,6 @@ export class MailService implements IMailService
 
     getBaseUrl()
     {
-        return 'https://' +  this.config.get('DOMAIN');
+        return 'https://' +  this.config.get('EMAIL_LINK_HOST');
     }
 }
