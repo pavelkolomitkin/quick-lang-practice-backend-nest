@@ -5,7 +5,7 @@ module.exports = {
         useNewUrlParser: true,
         replicaSet: process.env.MONGO_REPLICASET,
         autoIndex: false,
-        poolSize: 200,
+        poolSize: parseInt(process.env.MONGO_POOL_SIZE),
         useFindAndModify: false
     },
 
