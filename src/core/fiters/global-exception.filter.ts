@@ -1,7 +1,7 @@
-import {ArgumentsHost, Catch, ExceptionFilter, HttpStatus} from '@nestjs/common';
+import {ArgumentsHost, BadRequestException, Catch, ExceptionFilter, HttpStatus, InternalServerErrorException} from '@nestjs/common';
 import {Request, Response} from 'express';
 
-@Catch()
+@Catch(InternalServerErrorException)
 export class GlobalExceptionFilter implements ExceptionFilter
 {
     catch(exception: any, host: ArgumentsHost): any {
@@ -14,6 +14,5 @@ export class GlobalExceptionFilter implements ExceptionFilter
         response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'The service is not available. Please, try it later'
         });
-
     }
 }
