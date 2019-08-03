@@ -1,17 +1,18 @@
-import {ClassSerializerInterceptor, Global, Module, ValidationPipe} from '@nestjs/common';
+import {ClassSerializerInterceptor, Global, Module, Provider, ValidationPipe} from '@nestjs/common';
 import {ConfigModule} from '../config/config.module';
 import { models } from './providers/models.provider';
 import { services } from './providers/services.provider';
-import {APP_PIPE, APP_INTERCEPTOR, APP_FILTER} from '@nestjs/core';
 import {LanguageController} from './controllers/language.controller';
 import {LanguageLevelController} from './controllers/language-level.controller';
-import {BadRequestFilter} from './fiters/bad-request.filter';
 import {SecurityModule} from '../security/security.module';
 import {EntityExistsValidator} from './validators/entity-exists.validator';
 import {MulterModule} from '@nestjs/platform-express';
 import {AvatarController} from './controllers/avatar.controller';
 import {ImageThumbService} from './services/image-thumb.service';
 import {UploadManagerService} from './services/upload-manager.service';
+import {APP_FILTER, APP_INTERCEPTOR, APP_PIPE} from '@nestjs/core';
+import {BadRequestFilter} from './fiters/bad-request.filter';
+import { providers as filters } from './providers/filters.provider';
 
 @Global()
 @Module({
@@ -30,7 +31,7 @@ import {UploadManagerService} from './services/upload-manager.service';
             provide: APP_INTERCEPTOR,
             useClass: ClassSerializerInterceptor,
         },
-
+        ...filters,
         EntityExistsValidator,
         ImageThumbService,
         UploadManagerService,
