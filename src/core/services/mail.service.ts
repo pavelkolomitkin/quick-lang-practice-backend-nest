@@ -18,7 +18,8 @@ export class MailService implements IMailService
         private readonly config: ConfigService
     ) {
         this.template = hbs.create({
-            layoutsDir: __dirname + '../templates'
+            layoutsDir: __dirname + '/../templates',
+            partialsDir: __dirname + '/../templates'
         });
     }
 
@@ -38,6 +39,11 @@ export class MailService implements IMailService
                 auth: {
                     user: user,
                     pass: password
+                },
+                dkim: {
+                    domainName: this.config.get('OPENDIKIM_DOMAIN'),
+                    keySelector: this.config.get('OPENDIKIM_SELECTOR'),
+                    privateKey: this.config.get('OPENDIKIM_KEY')
                 }
             });
         }
@@ -60,7 +66,7 @@ export class MailService implements IMailService
     async sendPasswordRestoreLink(restoreKey: PasswordRestoreKey): Promise<void> {
 
         const link = this.getBaseUrl() + '/security/password-recovery/' + restoreKey.key;
-        const body = await this.template.render(this.getTemplatePath('register-confirmation.html'), {
+        const body = await this.template.render(this.getTemplatePath('restore-password.html'), {
             link: link,
             user: restoreKey.user
         });
@@ -96,7 +102,7 @@ export class MailService implements IMailService
 
     getTemplatePath(name: string)
     {
-        return name;
+        return __dirname + '/../templates/' + name;
     }
 
     getBaseUrl()

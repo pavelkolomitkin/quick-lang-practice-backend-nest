@@ -35,6 +35,9 @@ services:
       MAIL_USER: test
       MAIL_PASSWORD: test
       EMAIL_NO_REPLY: 'noreply@localhost.ru'
+      SSL_KEY_FILE_PATH: ''
+      SLL_CERT_FILE_PATH: ''
+
 
   mongodb-service:
     image: mongo:4.0.10-xenial
