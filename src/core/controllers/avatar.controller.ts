@@ -13,16 +13,19 @@ export class AvatarController
 
     }
 
-    @Get(':id/:size')
+    @Get(':userId/:pictureId/:size')
     async getThumb(
-        @Param('id', new ParameterConverterPipe('User', 'id')) user,
+        @Param('userId', new ParameterConverterPipe('User', 'id')) user,
         @Param('size') size: string,
         @Res() response: Response
         )
     {
+
         try {
             const filePath = await this.thumbService.getUserAvatar(user, size);
-            response.sendFile(filePath);
+            //response.sendFile(filePath);
+            response.setHeader('X-Accel-Redirect', filePath);
+            response.end('');
         }
         catch (error) {
             throw new NotFoundException();

@@ -64,11 +64,13 @@ const afterUserSerializeHook = (data: any, config: ConfigService) => {
     }
 
     const id: string = data.id.toString();
-    const host = (config.get('NODE_ENV', 'dev') === 'dev') ? 'http://localhost:3000' : '';
+    const fileName = data.avatar.filename;
+    const baseUrl = (config.get('NODE_ENV', 'dev') === 'dev') ? 'http://localhost:8080/api' : '/api';
+
 
     data.avatarThumbs = {
-        small: host + '/api/user/avatar/' + id + '/small',
-        medium: host + '/api/user/avatar/' + id + '/medium',
+        small: baseUrl + '/user/avatar/' + id + '/' + fileName + '/small',
+        medium: baseUrl + '/user/avatar/' + id + '/' + fileName + '/medium',
     };
 };
 
