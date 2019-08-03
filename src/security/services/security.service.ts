@@ -106,6 +106,7 @@ export class SecurityService
 
         const user = keyEntity.user;
         user.password = await hash(password, SecurityService.PASSWORD_HASH_SALT);
+        user.isActive = true;
 
         await user.save();
         await keyEntity.remove();
