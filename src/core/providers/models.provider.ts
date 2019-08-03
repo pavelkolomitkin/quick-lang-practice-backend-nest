@@ -64,7 +64,7 @@ const afterUserSerializeHook = (data: any, config: ConfigService) => {
     }
 
     const id: string = data.id.toString();
-    const host = (config.get('APP_ENV', 'dev') === 'dev') ? 'http://localhost:3000' : '';
+    const host = (config.get('NODE_ENV', 'dev') === 'dev') ? 'http://localhost:3000' : '';
 
     data.avatarThumbs = {
         small: host + '/api/user/avatar/' + id + '/small',

@@ -36,7 +36,7 @@ export const services: Provider[] = [
         provide: 'MAILER',
         inject: [ConfigService],
         useFactory: (configService: ConfigService): IMailService => {
-            return configService.get('APP_ENV', 'dev') === 'dev' ? (new MailDevService()) : (new MailService());
+            return configService.get('NODE_ENV', 'dev') === 'dev' ? (new MailDevService()) : (new MailService(configService));
         },
     },
 ];

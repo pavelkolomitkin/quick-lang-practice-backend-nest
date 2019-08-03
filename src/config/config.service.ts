@@ -6,9 +6,15 @@ import { config as thumb } from './thumb';
 @Injectable()
 export class ConfigService {
 
+    env: any;
+
+    constructor() {
+        this.env = {...process.env};
+    }
+
     public get(key: string, defaultValue: any = null): any
     {
-        return process.env[key] || defaultValue;
+        return this.env[key] || defaultValue;
     }
 
     public getMongoConfig(): { uri: string, options: any }

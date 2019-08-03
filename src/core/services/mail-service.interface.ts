@@ -10,4 +10,6 @@ export interface IMailService {
 
     sendPasswordRestoreNotify(user: User): Promise<void>;
 
+    send(from: string, to: string, subject: string, body: string);
+
 }

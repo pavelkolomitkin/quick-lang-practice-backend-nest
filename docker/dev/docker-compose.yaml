@@ -19,19 +19,25 @@ services:
     command: 'npm run start:debug'
     hostname: 'node-app-service'
     environment:
-      APP_ENV: 'dev'
+      NODE_ENV: 'dev'
       APP_SECRET: 'change_it'
-      MONGO_INITDB_ROOT_USERNAME: 'root'
-      MONGO_INITDB_ROOT_PASSWORD: '1234'
       MONGO_INITDB_DATABASE: 'qlp_practice'
       MONGO_REPLICASET: 'rs_qlp'
       MONGO_DATABASE_PORT: '27017'
+      MONGO_POOL_SIZE: '200'
       PORT: '3000'
-      NOREPLY_EMAIL: 'noreply@qlpractice.com'
       EMAIL_LINK_HOST: 'localhost:4200'
       UPLOAD_DIRECTORY: '/app/upload'
       IMAGE_THUMB_DIRECTORY: '/app/thumbs'
       MAX_UPLOAD_FILE_SIZE: '7340032' # 7M
+      MAIL_HOST: 'smtp.localhost.ru'
+      MAIL_PORT: 25
+      MAIL_USER: test
+      MAIL_PASSWORD: test
+      EMAIL_NO_REPLY: 'noreply@localhost.ru'
+      SSL_KEY_FILE_PATH: ''
+      SLL_CERT_FILE_PATH: ''
+
 
   mongodb-service:
     image: mongo:4.0.10-xenial
@@ -42,25 +48,8 @@ services:
     volumes:
       - quick_lang_practice_db_dev:/data/db
     environment:
-#      MONGO_INITDB_ROOT_USERNAME: 'root'
-#      MONGO_INITDB_ROOT_PASSWORD: '1234'
       MONGO_INITDB_DATABASE: 'qlp_practice'
     command: mongod --replSet rs_qlp
-
-#  mongo-admin-service:
-#    image: mongo-express
-#    container_name: 'mongo-admin'
-#    ports:
-#      - '8081:8081'
-#    links:
-#      - mongodb-service
-#    environment:
-#      ME_CONFIG_MONGODB_SERVER: 'mongodb-service/rs0'
-#      ME_CONFIG_MONGODB_PORT: 30001
-#      ME_CONFIG_BASICAUTH_USERNAME: 'root'
-#      ME_CONFIG_BASICAUTH_PASSWORD: '1234'
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: 'root'
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: '1234'
 
 volumes:
   quick_lang_practice_db_dev:
