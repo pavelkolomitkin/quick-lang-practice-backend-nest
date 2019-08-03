@@ -8,7 +8,7 @@ async function bootstrap() {
   let app = null;
   if (process.env.NODE_ENV === 'production')
   {
-    process.env.OPENDIKIM_KEY = fs.readFileSync(__dirname + '/opendkim/mail.private');
+    process.env.OPENDIKIM_KEY = fs.readFileSync('opendkim/mail.private');
 
     const sslKey = fs.readFileSync(process.env.SSL_KEY_FILE_PATH);
     const sslCert = fs.readFileSync(process.env.SLL_CERT_FILE_PATH);
