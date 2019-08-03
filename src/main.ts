@@ -24,7 +24,7 @@ async function bootstrap() {
   }
   else
   {
-    app = await NestFactory.create(AppModule);
+    app = await NestFactory.create(AppModule, { cors: true });
   }
 
   app.use(helmet());
