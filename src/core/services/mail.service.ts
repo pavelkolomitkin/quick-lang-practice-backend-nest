@@ -39,11 +39,6 @@ export class MailService implements IMailService
                 auth: {
                     user: user,
                     pass: password
-                },
-                dkim: {
-                    domainName: this.config.get('OPENDIKIM_DOMAIN'),
-                    keySelector: this.config.get('OPENDIKIM_SELECTOR'),
-                    privateKey: this.config.get('OPENDIKIM_KEY')
                 }
             });
         }
