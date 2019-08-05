@@ -13,6 +13,9 @@ import {PasswordRestoreKey} from '../../core/models/password-restore-key.model';
 import {UserRestorePasswordDto} from '../dto/user-restore-password.dto';
 import {UserCredentialsDto} from '../dto/user-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
+import {Language} from '../../core/models/language.model';
+import {LanguageLevel} from '../../core/models/language-level.model';
+import {LanguageSkill} from '../../core/models/language-skill.model';
 
 @Injectable()
 export class SecurityService
@@ -26,6 +29,9 @@ export class SecurityService
         @Inject('ClientUser') private readonly clientUserModel: Model<ClientUser>,
         @Inject('RegisterKey') private readonly registerKeyModel: Model<RegisterKey>,
         @Inject('PasswordRestoreKey') private readonly passwordRestoreKeyModel: Model<PasswordRestoreKey>,
+        @Inject('Language') private readonly languageModel: Model<Language>,
+        @Inject('LanguageLevel') private readonly languageLevelModel: Model<LanguageLevel>,
+        @Inject('LanguageSkill') private readonly languageSkillModel: Model<LanguageSkill>,
         @Inject('MAILER') private readonly mailer: IMailService,
         private readonly jwtService: JwtService,
         ) {}
@@ -33,6 +39,7 @@ export class SecurityService
     async register(data: UserRegisterDto): Promise<ClientUser>
     {
         const { email, password, fullName } = data;
+
 
         // hash the password
         const passwordHash = await hash(password, SecurityService.PASSWORD_HASH_SALT);
@@ -44,6 +51,7 @@ export class SecurityService
 
         // save it to the database
         await result.save();
+        await this.addUserSkill(data, result);
 
         // send the email to the user in order to provide a confirmation link
         const registerKey = new this.registerKeyModel({
@@ -55,6 +63,30 @@ export class SecurityService
         await this.mailer.sendRegisterConfirmation(registerKey);
 
         return result;
+    }
+
+    private async addUserSkill(data: UserRegisterDto, user: ClientUser)
+    {
+        const { language, level } = data;
+
+        // add first user skill
+        const languageGet = this.languageModel.findById(language);
+        const languageLevelGet = this.languageLevelModel.findById(level);
+
+        const languageEntity = await languageGet;
+        const languageLevelEntity = await languageLevelGet;
+        const skill = new this.languageSkillModel({
+            language: languageEntity,
+            level: languageLevelEntity,
+            user: user
+        });
+
+        await skill.save();
+
+        user.skills.push(skill);
+        user.readyToPracticeSkill = skill;
+        //@ts-ignore
+        await user.save();
     }
 
     async confirmRegisteredAccount(data: UserConfirmRegisterDto): Promise<ClientUser>
@@ -128,9 +160,14 @@ export class SecurityService
             throw new BadRequestException('Bad credentials!');
         }
 
-        const token = await this.jwtService.sign({ email: user.email });
+        const token = await this.getTokenByUser(user);
 
         return { user, token };
+    }
+
+    async getTokenByUser(user: User)
+    {
+        return this.jwtService.sign({ email: user.email });
     }
 
     async getActiveUserByEmail(email: string): Promise<any>
