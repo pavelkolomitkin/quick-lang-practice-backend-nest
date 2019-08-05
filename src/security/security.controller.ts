@@ -32,8 +32,12 @@ export class SecurityController {
     }
 
     @Put('register-confirm')
-    async confirmRegister(@Body() data: UserConfirmRegisterDto): Promise<void> {
-        await this.service.confirmRegisteredAccount(data);
+    async confirmRegister(@Body() data: UserConfirmRegisterDto) {
+
+        const user = await this.service.confirmRegisteredAccount(data);
+        const token = await this.service.getTokenByUser(user);
+
+        return { token };
     }
 
     @Post('restore-password-request')
